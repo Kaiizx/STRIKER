@@ -232,8 +232,7 @@ int main()
 		draw_enemy(enemy[i].x, enemy[i].y);
 		enemy[i].status = 1;
 	}
-	item.x = 40 + (rand() % 20);
-	item.y = 2 + (rand() % 3);
+	
 	do {
 		print_score(score);
 		print_hp(hp);
@@ -344,8 +343,10 @@ int main()
 		}
 
 		//item drop 
-		if (item.time % 100 == 0 && item.status == 0) 
+		if (item.time % 300 == 0 && item.status == 0) 
 		{
+			item.x = 40 + (rand() % 20);
+			item.y = 2 + (rand() % 3);
 			draw_item(item.x, item.y);
 			item.status = 1;
 		}
@@ -359,13 +360,14 @@ int main()
 			}
 			else 
 			{
-				clear_item(item.x, item.y);
-				draw_item(item.x, ++item.y);
-				if (abs(item.y - y) <= 2 && abs((item.x) - (x + 11)) < 2)
+				
+				if (item.time % 10 == 0)
 				{
-					erase_ship(x, y);
-					Sleep(20);
-					draw_ship(x, y);
+					clear_item(item.x, item.y);
+					draw_item(item.x, ++item.y);
+				}
+				if (abs(item.y - y) < 3  && abs((x + 6) - item.x) < 5)
+				{
 					clear_item(item.x,item.y);
 					item.status = 0;
 				}
