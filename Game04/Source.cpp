@@ -261,7 +261,7 @@ int main()
 			}
 			fflush(stdin);
 		}
-		//bullet
+		//bullet agjkajgkjl;
 
 		for (int i = 0; i < 99; i++)
 		{
