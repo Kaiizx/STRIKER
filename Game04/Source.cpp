@@ -207,8 +207,8 @@ void rerandomenamyafterhit(int c) {
 
 struct Item
 {
-	int x = 0;
-	int y = 0;
+	int x = 5;
+	int y = 3;
 	int status = 0;
 	int time = 0;
 
@@ -232,6 +232,8 @@ int main()
 		draw_enemy(enemy[i].x, enemy[i].y);
 		enemy[i].status = 1;
 	}
+	item.x = 40 + (rand() % 20);
+	item.y = 2 + (rand() % 3);
 	do {
 		print_score(score);
 		print_hp(hp);
@@ -319,7 +321,6 @@ int main()
 				{
 					clear_enemy(enemy[e].x, enemy[e].y);
 					rerandomenamyafterhit(e);
-
 				}
 				else
 				{
@@ -336,15 +337,41 @@ int main()
 					{
 						clear_enemy(enemy[e].x, enemy[e].y);
 						draw_enemy(--enemy[e].x, enemy[e].y);
-						Sleep(30);
+						
 					}
 				}
 			}
 		}
 
 		//item drop 
-		if (item.time % 10 == 0) { draw_item(5, 3); Sleep(50); clear_item(5, 3); }
-
+		if (item.time % 100 == 0 && item.status == 0) 
+		{
+			draw_item(item.x, item.y);
+			item.status = 1;
+		}
+		if (item.status==1)
+		{
+			if (item.y >= 38) 
+			{
+				clear_item(item.x, item.y);
+				item.status = 0;
+				draw_item(item.x, item.y);
+			}
+			else 
+			{
+				clear_item(item.x, item.y);
+				draw_item(item.x, ++item.y);
+				if (abs(item.y - y) <= 2 && abs((item.x) - (x + 11)) < 2)
+				{
+					erase_ship(x, y);
+					Sleep(20);
+					draw_ship(x, y);
+					clear_item(item.x,item.y);
+					item.status = 0;
+				}
+			}
+			
+		}
 
 		if (hp == 0)
 		{
@@ -358,7 +385,7 @@ int main()
 			gameover();
 		}
 
-		item.time += 1;
+		item.time++;
 		Sleep(50);
 
 	} while (ch != 'x');
