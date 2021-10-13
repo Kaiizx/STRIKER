@@ -83,6 +83,18 @@ void clear_enemy(int x, int y)
 	gotoxy(x, y + 1); printf("          ");
 }
 
+void draw_item(int x,int y)
+{
+	setcolor(1, 0);
+	gotoxy(x, y); printf("S");
+}
+
+void clear_item(int x, int y)
+{
+	setcolor(7, 0);
+	gotoxy(x, y); printf(" ");
+}
+
 char cursor(int x, int y) {
 	HANDLE hStd = GetStdHandle(STD_OUTPUT_HANDLE);
 	char buf[2]; COORD c = { x,y }; DWORD num_read;
@@ -171,7 +183,7 @@ struct Bullet
 {
 	int status = 0;
 	int x = 0, y = 0;
-}bs[99];
+}bs[50];
 
 struct Enemy
 {
@@ -193,6 +205,14 @@ void rerandomenamyafterhit(int c) {
 	enemy[c].status = 1;
 }
 
+struct Item
+{
+	int x = 0;
+	int y = 0;
+	int status = 0;
+	int time = 0;
+
+}item;
 
 int main()
 {
@@ -257,17 +277,16 @@ int main()
 				bs[current].status = 1;
 				bs[current].x = x + 12;
 				bs[current].y = y + 2;
-				current = (current + 1) % 99;
+				current = (current + 1) % 50;
 			}
 			fflush(stdin);
 		}
-		//bullet agjkajgkjl;
+		//bullet 
 
-		for (int i = 0; i < 99; i++)
+		for (int i = 0; i < 50; i++)
 		{
 			if (bs[i].status == 1)
 			{
-
 				clear_bullet(bs[i].x, bs[i].y);
 				if (bs[i].x >= 116)
 				{
@@ -288,36 +307,7 @@ int main()
 						}
 					}
 				}
-
-				/*clear_bullet(bs[i].x, bs[i].y);
-				char checkenemy = attribute(bs[i].x + 5, bs[i].y);
-				gotoxy(3, 2); printf("%d", checkenemy);
-				if (bs[i].x >= 116)
-				{
-					bs[i].status = 0;
-				}
-				else
-				{
-					if (checkenemy == 4)
-					{
-						bs[i].status = 0;
-						clear_bullet(bs[i].x, bs[i].y);
-						clear_enemy_hit_bullet(bs[i].x , bs[i].y);
-
-						/*if (bs[i].x + 5 == enemy[0].x)
-						{
-							rerandomenamyafterhit(0);
-							score += 10;
-						}
-						if (bs[i].x + 5 == enemy[1].x)
-						{
-							rerandomenamyafterhit(1);
-							score += 10;
-						}*/
-
 			}
-
-
 		}
 
 		//enemy_move
@@ -352,6 +342,10 @@ int main()
 			}
 		}
 
+		//item drop 
+		if (item.time % 10 == 0) { draw_item(5, 3); Sleep(50); clear_item(5, 3); }
+
+
 		if (hp == 0)
 		{
 			erase_ship(x, y);
@@ -364,7 +358,7 @@ int main()
 			gameover();
 		}
 
-
+		item.time += 1;
 		Sleep(50);
 
 	} while (ch != 'x');
