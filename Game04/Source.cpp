@@ -83,13 +83,26 @@ void clear_enemy(int x, int y)
 	gotoxy(x, y + 1); printf("          ");
 }
 
-void draw_item(int x,int y)
+void draw_missile(int x, int y)
 {
-	setcolor(1, 0);
-	gotoxy(x, y); printf("S");
+	setcolor(4, 0);
+	gotoxy(x, y); printf("(000{");
 }
 
-void clear_item(int x, int y)
+void clear_missile(int x, int y)
+{
+	setcolor(7, 0);
+	gotoxy(x, y); printf("     ");
+}
+
+
+void draw_heal(int x,int y)
+{
+	setcolor(2, 0);
+	gotoxy(x, y); printf("H");
+}
+
+void clear_heal(int x, int y)
 {
 	setcolor(7, 0);
 	gotoxy(x, y); printf(" ");
@@ -190,7 +203,14 @@ struct Enemy
 	int hp = 10;
 	int x = 0, y = 0;
 	int status = 0;
-}enemy[2];;
+}enemy[2];
+
+struct Missile
+{
+	int hp = 10;
+	int x = 0, y = 0;
+	int status = 0;
+}missile[5];
 
 int newex, newey;
 int* rnewxy;
@@ -203,6 +223,21 @@ void rerandomenamyafterhit(int c) {
 	enemy[c].y = *(rnewxy + 1);
 	draw_enemy(enemy[c].x, enemy[c].y);
 	enemy[c].status = 1;
+	enemy[c].hp = 10;
+}
+
+int newmx, newmy;
+int* rnewmxy;
+void rerandommissileafterhit(int c) {
+	missile[c].status = 0;
+	newmx = 90 + (rand() % 17);
+	newmy = 5 + (rand() % 32);
+	rnewmxy = checkotherenemy(newmx, newmy);
+	missile[c].x = *(rnewmxy + 0);
+	missile[c].y = *(rnewmxy + 1);
+	draw_missile(missile[c].x, missile[c].y);
+	missile[c].status = 1;
+	missile[c].hp = 10;
 }
 
 struct Item
@@ -210,10 +245,10 @@ struct Item
 	int x = 5;
 	int y = 3;
 	int status = 0;
-	int time = 0;
 
 }item;
 
+long frame = 1;
 int main()
 {
 	char ch = ' ';
@@ -224,6 +259,8 @@ int main()
 	draw_ship(x, y);
 	int current = 0;
 	srand(time(NULL));
+
+	//สุ่มเกิดศัตรู
 	for (i = 0; i < 2; i++)
 	{
 		enemy[i].x = 90 + (rand() % 17);
@@ -232,6 +269,18 @@ int main()
 		draw_enemy(enemy[i].x, enemy[i].y);
 		enemy[i].status = 1;
 	}
+
+	//สุ่มเกิดmisslie
+	for (i = 0; i < 5; i++)
+	{
+		missile[i].x = 90 + (rand() % 17);
+		missile[i].y = 5 + (rand() % 32);
+		checkotherenemy(missile[i].x, missile[i].y);
+		draw_missile(missile[i].x, missile[i].y);
+		missile[i].status = 1;
+	}
+
+	
 	
 	do {
 		print_score(score);
@@ -266,7 +315,7 @@ int main()
 			}
 			if (ch == 'w')
 			{
-				if (y > 0)
+				if (y > 2)
 				{
 					erase_ship(x, y);
 					draw_ship(x, --y);
@@ -301,8 +350,15 @@ int main()
 						if (abs(enemy[e].y - bs[i].y) <= 1 && abs((enemy[e].x + 5) - (bs[i].x + 4)) < 5)
 						{
 							clear_bullet(bs[i].x, bs[i].y);
-							clear_enemy(enemy[e].x, enemy[e].y);
+							//clear_enemy(enemy[e].x, enemy[e].y);
+							enemy[e].hp -= 10;
 							bs[i].status = 0;
+							//score += 10;
+							//rerandomenamyafterhit(e);
+						}
+						if (enemy[e].hp == 0)
+						{
+							clear_enemy(enemy[e].x, enemy[e].y);
 							score += 10;
 							rerandomenamyafterhit(e);
 						}
@@ -334,41 +390,94 @@ int main()
 					}
 					else
 					{
-						clear_enemy(enemy[e].x, enemy[e].y);
-						draw_enemy(--enemy[e].x, enemy[e].y);
-						
+						if (frame % 10 == 0) 
+						{ clear_enemy(enemy[e].x, enemy[e].y); draw_enemy(--enemy[e].x, enemy[e].y); }
+					}
+				}
+			}
+		}
+
+		//missile_move
+		for (int e = 0; e < 5; e++)
+		{
+			if (missile[e].status == 1) {
+				if (missile[e].x <= 0)//ชนขอบ
+				{
+					clear_missile(missile[e].x, missile[e].y);
+					rerandommissileafterhit(e);
+				}
+				else
+				{
+					if (abs(missile[e].y - y) <= 1 && abs((missile[e].x) - (x + 11)) < 2)
+					{
+						erase_ship(x, y);
+						Sleep(20);
+						draw_ship(x, y);
+						clear_missile(missile[e].x, missile[e].y);
+						rerandommissileafterhit(e);
+						hp -= 10;
+					}
+					else
+					{
+						//if (frame % 10 == 0)
+						{
+							//clear_missile(missile[e].x, missile[e].y);
+							if (missile[e].y < y) 
+							{
+								if (frame % 10 == 0)
+								{
+									clear_missile(missile[e].x, missile[e].y);
+									draw_missile(--missile[e].x, ++missile[e].y);
+								}
+							}
+							else if (missile[e].y > y) 
+							{
+								if (frame % 10 == 0)
+								{
+									clear_missile(missile[e].x, missile[e].y);
+									draw_missile(--missile[e].x, --missile[e].y);
+								}
+							}
+							else 
+								if (frame % 10 == 0)
+								{
+									clear_missile(missile[e].x, missile[e].y);
+									draw_missile(--missile[e].x, missile[e].y);
+								}
+						}
 					}
 				}
 			}
 		}
 
 		//item drop 
-		if (item.time % 300 == 0 && item.status == 0) 
+		if (frame % 300 == 0 && item.status == 0) 
 		{
 			item.x = 40 + (rand() % 20);
 			item.y = 2 + (rand() % 3);
-			draw_item(item.x, item.y);
+			draw_heal(item.x, item.y);
 			item.status = 1;
 		}
 		if (item.status==1)
 		{
 			if (item.y >= 38) 
 			{
-				clear_item(item.x, item.y);
+				clear_heal(item.x, item.y);
 				item.status = 0;
-				draw_item(item.x, item.y);
+				draw_heal(item.x, item.y);
 			}
 			else 
 			{
 				
-				if (item.time % 10 == 0)
+				if (frame % 30 == 0)
 				{
-					clear_item(item.x, item.y);
-					draw_item(item.x, ++item.y);
+					clear_heal(item.x, item.y);
+					draw_heal(item.x, ++item.y);
 				}
 				if (abs(item.y - y) < 3  && abs((x + 6) - item.x) < 5)
 				{
-					clear_item(item.x,item.y);
+					clear_heal(item.x,item.y);
+					hp = hp + 10;
 					item.status = 0;
 				}
 			}
@@ -383,12 +492,21 @@ int main()
 				clear_enemy(enemy[i].x, enemy[i].y);
 				enemy[i].status = 0;
 			}
+			for (i = 0; i < 5; i++)
+			{
+				clear_missile(missile[i].x, missile[i].y);
+				missile[i].status = 0;
+			}
 			gotoxy(55, 20);
 			gameover();
 		}
-
-		item.time++;
-		Sleep(50);
+		
+		if (frame % 10 == 0)
+		{
+			score++;
+		}
+		frame++;
+		Sleep(10);
 
 	} while (ch != 'x');
 
