@@ -209,7 +209,7 @@ struct Enemy
 	int hp = 10;
 	int x = 0, y = 0;
 	int status = 0;
-}enemy[2];
+}enemy[10];
 
 struct Missile
 {
@@ -254,9 +254,10 @@ struct Item
 
 }item;
 
-long frame = 1;
+ long frame = 1;
 int maxenemy = 2;
 int maxmissile = 3;
+int changelevel = 100;
 
 int level = 1;
 int main()
@@ -271,28 +272,54 @@ int main()
 	srand(time(NULL));
 
 	//สุ่มเกิดศัตรู
-	for (i = 0; i < maxenemy; i++)
+	/*for (i = 0; i < maxenemy; i++)
 	{
 		enemy[i].x = 90 + (rand() % 17);
 		enemy[i].y = 5 + (rand() % 32);
 		checkotherenemy(enemy[i].x, enemy[i].y);
 		draw_enemy(enemy[i].x, enemy[i].y);
 		enemy[i].status = 1;
-	}
+	}*/
 
 	//สุ่มเกิดmisslie
-	for (i = 0; i < maxmissile; i++)
+	/*for (i = 0; i < maxmissile; i++)
 	{
 		missile[i].x = 90 + (rand() % 17);
 		missile[i].y = 5 + (rand() % 32);
 		checkotherenemy(missile[i].x, missile[i].y);
 		draw_missile(missile[i].x, missile[i].y);
 		missile[i].status = 1;
-	}
+	}*/
 
 	
 	
 	do {
+		//สุ่มเกิดศัตรู
+		for (i = 0; i < maxenemy; i++)
+		{
+			if (enemy[i].status == 0) 
+			{
+				enemy[i].x = 90 + (rand() % 17);
+				enemy[i].y = 5 + (rand() % 32);
+				checkotherenemy(enemy[i].x, enemy[i].y);
+				draw_enemy(enemy[i].x, enemy[i].y);
+				enemy[i].status = 1;
+			}
+			
+		}
+		//สุ่มเกิดmissile
+		for (i = 0; i < maxmissile; i++)
+		{
+			if (missile[i].status == 0) 
+			{
+				missile[i].x = 90 + (rand() % 17);
+				missile[i].y = 5 + (rand() % 32);
+				checkotherenemy(missile[i].x, missile[i].y);
+				draw_missile(missile[i].x, missile[i].y);
+				missile[i].status = 1;
+			}
+		}
+
 		print_score(score);
 		print_hp(hp);
 		print_level(level);
@@ -399,7 +426,7 @@ int main()
 					}
 					else
 					{
-						if (frame % 5 == 0) 
+						if (frame % 3 == 0) 
 						{ clear_enemy(enemy[e].x, enemy[e].y); draw_enemy(--enemy[e].x, enemy[e].y); }
 					}
 				}
@@ -433,7 +460,7 @@ int main()
 							//clear_missile(missile[e].x, missile[e].y);
 							if (missile[e].y < y) 
 							{
-								if (frame % 30 == 0)
+								if (frame % 10 == 0)
 								{
 									clear_missile(missile[e].x, missile[e].y);
 									draw_missile(--missile[e].x, ++missile[e].y);
@@ -441,14 +468,14 @@ int main()
 							}
 							else if (missile[e].y > y) 
 							{
-								if (frame % 30 == 0)
+								if (frame % 10 == 0)
 								{
 									clear_missile(missile[e].x, missile[e].y);
 									draw_missile(--missile[e].x, --missile[e].y);
 								}
 							}
 							else 
-								if (frame % 30 == 0)
+								if (frame % 10 == 0)
 								{
 									clear_missile(missile[e].x, missile[e].y);
 									draw_missile(--missile[e].x, missile[e].y);
@@ -460,7 +487,7 @@ int main()
 		}
 
 		//item drop 
-		if (frame % 500 == 0 && item.status == 0) 
+		if (frame % 1000 == 0 && item.status == 0) 
 		{
 			item.x = 40 + (rand() % 20);
 			item.y = 2 + (rand() % 3);
@@ -492,6 +519,7 @@ int main()
 			}
 			
 		}
+		if (score > changelevel) { level++; maxenemy++; changelevel += 100; }
 
 		if (hp == 0)
 		{
@@ -511,14 +539,15 @@ int main()
 			gotoxy(55, 20);
 			gameover();
 		}
-		if (score > 100) { level = 2; }
-		if (level == 2) { maxenemy++; maxmissile++; }
+		
+		//if (level == 2) { maxenemy = 3; }
 		
 		if (frame % 50 == 0)
 		{
 			score++;
 		}
 		frame++;
+		
 		Sleep(10);
 
 	} while (ch != 'x');
