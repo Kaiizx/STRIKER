@@ -65,6 +65,14 @@ void draw_enemy(int x, int y)
 	gotoxy(x, y + 1); printf("\\________/");
 }
 
+void draw_enemy2(int x, int y)
+{
+	setcolor(9, 0);
+	gotoxy(x + 3, y - 1); printf("____");
+	gotoxy(x, y);   printf("__/*===|__");
+	gotoxy(x, y + 1); printf("\\________/");
+}
+
 void clear_enemy_hit_bullet(int x, int y)
 {
 	setcolor(7, 0);
@@ -143,7 +151,7 @@ void print_score(int x)
 	gotoxy(109, 0); printf("Score : %d", x);
 }
 
-int hp = 100;
+
 void print_hp(int x)
 {
 	setcolor(4, 0);
@@ -217,6 +225,13 @@ struct Enemy
 	int status = 0;
 }enemy[10];
 
+struct Enemy2
+{
+	int hp = 10;
+	int x = 0, y = 0;
+	int status = 0;
+}enemy2[10];
+
 struct Missile
 {
 	int hp = 10;
@@ -253,13 +268,13 @@ void rerandommissileafterhit(int c) {
 	missile[c].hp = 10;
 }
 
-struct Item
+struct Heal
 {
 	int x = 5;
 	int y = 3;
 	int status = 0;
 
-}item;
+}heal;
 
 unsigned long frame = 1;
 int maxenemy = 2;
@@ -271,6 +286,7 @@ int main()
 {
 	char ch = ' ';
 	int x = 10, y = 20;
+	int hp = 90;
 	setcursor(0);
 	int i;
 
@@ -408,7 +424,7 @@ int main()
 						draw_ship(x, y);
 						clear_enemy(enemy[e].x, enemy[e].y);
 						rerandomenamyafterhit(e);
-						hp -= 10;
+						hp = hp-10;
 					}
 					else
 					{
@@ -418,7 +434,6 @@ int main()
 				}
 			}
 		}
-
 		//missile_move
 		for (int e = 0; e < maxmissile; e++)
 		{
@@ -475,41 +490,38 @@ int main()
 			}
 		}
 		//item drop 
-		if (frame % 1000 == 0 && item.status == 0) 
+		if (frame % 1000 == 0 && heal.status == 0) 
 		{
-			item.x = 40 + (rand() % 20);
-			item.y = 2 + (rand() % 3);
-			draw_heal(item.x, item.y);
-			item.status = 1;
+			heal.x = 40 + (rand() % 20);
+			heal.y = 2 + (rand() % 3);
+			draw_heal(heal.x, heal.y);
+			heal.status = 1;
 		}
-		if (item.status==1)
+		if (heal.status==1)
 		{
-			if (item.y >= 38) 
+			if (heal.y >= 38)
 			{
-				clear_heal(item.x, item.y);
-				item.status = 0;
-				
+				clear_heal(heal.x, heal.y);
+				heal.status = 0;
 			}
 			else 
 			{
-				
 				if (frame % 30 == 0)
 				{
-					clear_heal(item.x, item.y);
-					draw_heal(item.x, ++item.y);
+					clear_heal(heal.x, heal.y);
+					draw_heal(heal.x, ++heal.y);
 				}
-				if (abs(item.y - y) < 3  && abs((x + 6) - item.x) < 5)
+				if (abs(heal.y - y) < 3  && abs((x + 6) - heal.x) < 5)
 				{
-					clear_heal(item.x,item.y);
+					clear_heal(heal.x, heal.y);
 					hp = hp + 10;
-					item.status = 0;
+					heal.status = 0;
 				}
 			}
-			
 		}
 		if (score > changelevel) { level++; maxenemy++; changelevel += 100; }
 
-		if (hp == 0)
+		/*if (hp == 0)
 		{
 			erase_ship(x, y);
 			for (i = 0; i < maxenemy; i++)
@@ -522,14 +534,12 @@ int main()
 				clear_missile(missile[i].x, missile[i].y);
 				missile[i].status = 0;
 			}
-			clear_heal(item.x, item.y);
-			item.status = 0;
+			clear_heal(heal.x, heal.y);
+			heal.status = 0;
 			gotoxy(55, 20);
 			gameover();
-		}
-		
-		
-		
+		}*/
+
 		if (frame % 50 == 0)
 		{
 			score++;
