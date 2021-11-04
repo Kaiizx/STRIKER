@@ -176,11 +176,9 @@ void gameover() {
 	printf("GAME OVER");
 }
 
-int xy[2];
+int xy[2];int count = 0;int around = 0;
 int* checkotherenemy(int x, int y)
 {
-	int around = 0;
-	int count = 0;
 	while (around == 0)
 	{
 		int endx = x + 10;
@@ -191,10 +189,9 @@ int* checkotherenemy(int x, int y)
 			{
 				//char checkenemy = cursor(x,y);
 				char checkenemy = attribute(x, y);
-				if (//checkenemy == '_'|| checkenemy == '\\'|| checkenemy == '*'|| checkenemy == '='|| checkenemy == '|'|| checkenemy == '/'
-					checkenemy == 4)
+				if (checkenemy == 4|| checkenemy == 5)
 				{
-					count++;
+					count = 1;
 				}
 			}
 		}
@@ -209,8 +206,12 @@ int* checkotherenemy(int x, int y)
 		{
 			x = 90 + (rand() % 17);
 			y = 5 + (rand() % 32);
+			//count = 0;
 		}
+		
 	}
+	
+	
 }
 
 struct Bullet
@@ -352,6 +353,7 @@ int main()
 		print_hp(hp);
 		print_level(level);
 		print_frame(frame);
+		setcolor(4, 0); gotoxy(70, 0); printf("count : %d", count);
 		if (_kbhit()) {
 			ch = _getch();
 			if (ch == 'a')
