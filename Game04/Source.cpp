@@ -187,11 +187,11 @@ int* checkotherenemy(int x, int y)
 		{
 			for (int j = y - 7; j <= endy; j++)
 			{
-				//char checkenemy = cursor(x,y);
-				char checkenemy = attribute(x, y);
-				if (checkenemy == 4|| checkenemy == 5)
+				char checkenemy = cursor(x,y);
+				//char checkenemy = attribute(x, y);
+				if (checkenemy != ' ')
 				{
-					count = 1;
+					count++;
 				}
 			}
 		}
@@ -206,7 +206,7 @@ int* checkotherenemy(int x, int y)
 		{
 			x = 90 + (rand() % 17);
 			y = 5 + (rand() % 32);
-			//count = 0;
+			count = 0;
 		}
 		
 	}
