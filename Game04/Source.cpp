@@ -1,9 +1,5 @@
-﻿#include <stdio.h>
-#include <conio.h>
-#include <windows.h>
-#include <time.h>
-#include <thread>
-#include <mutex>
+﻿
+#include "ScoreBoard.h"
 
 std::mutex mtx;
 
@@ -176,7 +172,7 @@ void gameover() {
 	printf("GAME OVER");
 }
 
-int xy[2];int count = 0;int around = 0;
+int xy[2];int counter = 0;int around = 0;
 int* checkotherenemy(int x, int y)
 {
 	while (around == 0)
@@ -189,13 +185,13 @@ int* checkotherenemy(int x, int y)
 			{
 				char checkenemy = cursor(x,y);
 				//char checkenemy = attribute(x, y);
-				if (checkenemy != ' ')
+				if (checkenemy == ' ')
 				{
-					count++;
+				
 				}
 			}
 		}
-		if (count == 0)
+		if (counter == 0)
 		{
 			xy[0] = x;
 			xy[1] = y;
@@ -206,7 +202,7 @@ int* checkotherenemy(int x, int y)
 		{
 			x = 90 + (rand() % 17);
 			y = 5 + (rand() % 32);
-			count = 0;
+			counter = 0;
 		}
 		
 	}
@@ -301,7 +297,7 @@ int main()
 {
 	char ch = ' ';
 	int x = 10, y = 20;
-	int hp = 90;
+	int hp = 10;
 	setcursor(0);
 	int i;
 
@@ -353,7 +349,7 @@ int main()
 		print_hp(hp);
 		print_level(level);
 		print_frame(frame);
-		setcolor(4, 0); gotoxy(70, 0); printf("count : %d", count);
+		setcolor(4, 0); gotoxy(70, 0); printf("count : %d", counter);
 		if (_kbhit()) {
 			ch = _getch();
 			if (ch == 'a')
@@ -645,6 +641,16 @@ int main()
 			heal.status = 0;
 			gotoxy(55, 20);
 			gameover();
+			
+			scoreRead("score.txt");
+			scoreAdd("score.txt","asd",30);
+			for (int i = 0; i < 5; i++)
+			{
+				gotoxy(55, 22+i);
+				printf("%s,%d", data[i].name, data[i].score);
+			}
+			
+			
 		}
 
 		if (frame % 50 == 0)
