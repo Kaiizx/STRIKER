@@ -24,6 +24,18 @@ void gotoxy(int x, int y)
 		GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
 
+void clear_screen()
+{
+	setcolor(7, 0);
+	for ( int i = 0; i <= 120; i++)
+	{
+		for (int j = 0; j <=40 ; j++)
+		{
+			gotoxy(i, j); printf(" ");
+		}
+	}
+}
+
 void print_menu()
 {
 	setcolor(4, 0);
@@ -373,8 +385,9 @@ int main()
 				if (page == 0)
 				{
 					clear_pointer(pointx, pointy);
-					if (pointer == 1) { pointer = 2; pointx = pointx + 2; }
-					if (pointer == 2) { pointer = 1; pointx = pointx - 2; }
+					//if (pointer == 1) { pointer = 2; pointx = pointx + 2; }
+					//if (pointer == 2) { pointer = 1; pointx = pointx - 2; }
+					pointy = pointy + 2;
 					print_pointer(pointx, pointy);
 				}
 				if (page == 1)
@@ -392,8 +405,9 @@ int main()
 				if (page == 0)
 				{
 					clear_pointer(pointx, pointy);
-					if (pointer == 1) { pointer++; pointx = pointx + 2; }
-					if (pointer == 2) { pointer = 1; pointx = pointx - 2; }
+					//if (pointer == 1)
+					//if (pointer == 2) 
+					pointy = pointy - 2;
 					print_pointer(pointx, pointy);
 				}
 				if (page == 1)
@@ -410,11 +424,11 @@ int main()
 			{
 				if (page == 0)
 				{
-					if (pointer == 1)//point_start
+					if (pointy == 20)//point_start
 					{
 						page = 1;
 					}
-					if (pointer == 2)//point_scoreboard
+					if (pointy == 22)//point_scoreboard
 					{
 						page = 2;
 					}
@@ -748,6 +762,11 @@ int main()
 			}
 			frame++;
 			Sleep(10);
+		}
+		if (page == 2)
+		{
+			clear_screen();
+			gotoxy(70, 0); printf("page2");
 		}
 	} while (ch != 'x');
 
