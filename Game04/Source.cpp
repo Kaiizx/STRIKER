@@ -345,6 +345,8 @@ int page = 0;
 int pointer = 1;
 int pointx = 46, pointy = 20;
 int level = 1;
+
+char playername[20];
 int main()
 {
 	char ch = ' ';
@@ -385,9 +387,7 @@ int main()
 				if (page == 0)
 				{
 					clear_pointer(pointx, pointy);
-					//if (pointer == 1) { pointer = 2; pointx = pointx + 2; }
-					//if (pointer == 2) { pointer = 1; pointx = pointx - 2; }
-					pointy = pointy + 2;
+					if (pointy != 22) { pointy = pointy + 2; }
 					print_pointer(pointx, pointy);
 				}
 				if (page == 1)
@@ -405,9 +405,7 @@ int main()
 				if (page == 0)
 				{
 					clear_pointer(pointx, pointy);
-					//if (pointer == 1)
-					//if (pointer == 2) 
-					pointy = pointy - 2;
+					if (pointy != 20) { pointy = pointy - 2; }
 					print_pointer(pointx, pointy);
 				}
 				if (page == 1)
@@ -422,17 +420,6 @@ int main()
 			}
 			if (ch == ' ' )
 			{
-				if (page == 0)
-				{
-					if (pointy == 20)//point_start
-					{
-						page = 1;
-					}
-					if (pointy == 22)//point_scoreboard
-					{
-						page = 2;
-					}
-				}
 				if (page == 1 && bs[current].status == 0)
 				{
 					bs[current].status = 1;
@@ -441,17 +428,37 @@ int main()
 					current = (current + 1) % 50;
 				}
 			}
+			if (ch =='e')
+			{
+				if (page == 0)
+				{
+					if (pointy == 20)//point_start
+					{
+						clear_screen();
+						page = 1;
+					}
+					if (pointy == 22)//point_scoreboard
+					{
+						clear_screen();
+						page = 2;
+					}
+				}
+				if (page == 0)
+				{
+					clear_screen();
+					page = 0;
+				}
+			}
 			fflush(stdin);
 		}
 		if (page == 0)//menu 
 		{
-			setcolor(4, 0); gotoxy(70, 0); printf("pointer : %d", pointer);
 			print_menu();
 		}
 		if (page == 1)//gamestart
 		{
-			clear_menu();
-			clear_pointer(pointx,pointy);
+			//clear_menu();
+			//clear_pointer(pointx,pointy);
 			draw_ship(ship.x, ship.y);
 			print_score(score);
 			print_hp(ship.hp);
@@ -727,33 +734,11 @@ int main()
 
 
 			//gameover
-			if (ship.hp <= 0)
+			if (ship.hp == 0)
 			{
-				erase_ship(ship.x, ship.y);
-				for (i = 0; i < maxenemy; i++)
-				{
-					clear_enemy(enemy[i].x, enemy[i].y);
-					enemy[i].status = 0;
-				}
-				for (i = 0; i < maxmissile; i++)
-				{
-					clear_missile(missile[i].x, missile[i].y);
-					missile[i].status = 0;
-				}
-				clear_heal(heal.x, heal.y);
-				heal.status = 0;
-				gotoxy(55, 20);
-				gameover();
-
-				scoreRead("score.txt");
-				scoreAdd("score.txt", "asd", 30);
-				for (int i = 0; i < 5; i++)
-				{
-					gotoxy(55, 22 + i);
-					printf("%s,%d", data[i].name, data[i].score);
-				}
-
-
+				clear_screen();
+				frame = 0;
+				page = 3;
 			}
 
 			if (frame % 50 == 0)
@@ -763,11 +748,30 @@ int main()
 			frame++;
 			Sleep(10);
 		}
-		if (page == 2)
+		if (page == 2)//scoreboard
 		{
-			clear_screen();
-			gotoxy(70, 0); printf("page2");
+			gotoxy(53, 12); printf("SCORE BOARD");
+			scoreRead("score.txt");
+			for (int i = 0; i < 5; i++)
+			{
+				gotoxy(50, 16 + (2*i));
+				printf("%s", data[i].name);
+				gotoxy(65, 16 + (2 * i));
+				printf("%d", data[i].score);
+
+			}	
 		}
+		if (page == 3)//gameover
+		{
+			gotoxy(55, 14);
+			gameover();
+			gotoxy(55, 16);
+			printf("ENTER YOUR NAME");
+			gotoxy(55, 18);
+			scanf_s("%s",playername);
+			scoreAdd("score.txt", playername,score);
+		}
+
 	} while (ch != 'x');
 
 	return 0;
