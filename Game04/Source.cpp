@@ -1,6 +1,5 @@
 ﻿
 #include "ScoreBoard.h"
-
 std::mutex mtx;
 
 void setcursor(bool visible)
@@ -138,6 +137,17 @@ void clear_missile(int x, int y)
 	gotoxy(x, y); printf("     ");
 }
 
+void draw_beam(int x, int y)
+{
+	setcolor(9, 0);
+	gotoxy(x, y); printf("C888<");
+}
+
+void clear_beam(int x, int y)
+{
+	setcolor(7, 0);
+	gotoxy(x, y); printf("     ");
+}
 
 void draw_heal(int x,int y)
 {
@@ -277,6 +287,14 @@ struct Missile
 	int status = 0;
 }missile[5];
 
+struct Beam
+{
+	int x = 0, y = 0;
+	int status = 0;
+}beam[2];
+
+
+
 struct Ship 
 {
 	int x = 10, y = 20;
@@ -340,13 +358,15 @@ unsigned long frame = 1;
 int maxenemy = 2;
 int maxenemy2 = 0;
 int maxmissile = 3;
+int maxmissile2 = 2;
 int changelevel = 100;
 int page = 0;
 int pointer = 1;
 int pointx = 46, pointy = 20;
 int level = 1;
 
-char playername[20];
+char name[20];
+
 int main()
 {
 	char ch = ' ';
@@ -427,6 +447,16 @@ int main()
 					bs[current].y = ship.y + 1;
 					current = (current + 1) % 50;
 				}
+				if (page == 2)
+				{
+					clear_screen();
+					page = 0;
+				}
+				if (page == 3)
+				{
+					clear_screen();
+					page = 0;
+				}
 			}
 			if (ch =='e')
 			{
@@ -443,11 +473,7 @@ int main()
 						page = 2;
 					}
 				}
-				if (page == 0)
-				{
-					clear_screen();
-					page = 0;
-				}
+				
 			}
 			fflush(stdin);
 		}
@@ -501,7 +527,21 @@ int main()
 					missile[i].status = 1;
 				}
 			}
-
+			//สุ่มเกิดbeam
+			for ( i = 0; i < 2; i++)
+			{
+				if (beam[i].status == 0)
+				{
+					if (frame%100==0)
+					{
+						beam[i].x = 110;
+						beam[i].y = 5 + (rand() % 32);
+						draw_beam(beam[i].x, beam[i].y);
+						beam[i].status = 1;
+					}
+				}
+			}
+			
 
 			
 			//bullet 
@@ -609,7 +649,7 @@ int main()
 						}
 						else
 						{
-							if (frame % 3 == 0)
+							if (frame % 2 == 0)
 							{
 								clear_enemy(enemy2[e].x, enemy2[e].y); draw_enemy2(--enemy2[e].x, enemy2[e].y);
 							}
@@ -672,6 +712,33 @@ int main()
 					}
 				}
 			}
+			//beam_move
+			for (int e = 0; e < 2; e++)
+			{
+				if (beam[e].status == 1) {
+					if (beam[e].x <= 1)//ชนขอบ
+					{
+						clear_beam(beam[e].x, beam[e].y);
+						beam[e].status = 0;
+					}
+					else
+					{
+						if (abs(beam[e].y - ship.y) <= 2 && abs((beam[e].x) - (ship.x + 11)) < 2)
+						{
+							erase_ship(ship.x, ship.y);
+							Sleep(20);
+							draw_ship(ship.x, ship.y);
+							clear_beam(beam[e].x, beam[e].y);
+							ship.hp = ship.hp - 50;
+						}
+						else
+						{
+							clear_beam(beam[e].x, beam[e].y); draw_beam(--beam[e].x, beam[e].y);
+						}
+					}
+				}
+			}
+			
 			//item drop 
 			if (frame % 1000 == 0 && heal.status == 0)
 			{
@@ -758,18 +825,23 @@ int main()
 				printf("%s", data[i].name);
 				gotoxy(65, 16 + (2 * i));
 				printf("%d", data[i].score);
-
 			}	
 		}
 		if (page == 3)//gameover
 		{
-			gotoxy(55, 14);
-			gameover();
-			gotoxy(55, 16);
-			printf("ENTER YOUR NAME");
+			scoreRead("score.txt");
+			gotoxy(55, 14); gameover();
+			gotoxy(55, 16); printf("ENTER YOUR NAME");
 			gotoxy(55, 18);
-			scanf_s("%s",playername);
-			scoreAdd("score.txt", playername,score);
+			scanf_s("%19s", name,20);
+			scoreAdd("score.txt", name,score);
+			clear_screen();
+			page = 0;
+			frame = 0;
+			ship.hp = 20;
+			score = 0;
+			level = 0;
+
 		}
 
 	} while (ch != 'x');
