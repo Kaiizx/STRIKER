@@ -298,7 +298,7 @@ struct Beam
 struct Ship 
 {
 	int x = 10, y = 20;
-	int hp = 10;
+	int hp = 20;
 }ship;
 
 
@@ -532,7 +532,7 @@ int main()
 			{
 				if (beam[i].status == 0)
 				{
-					if (frame%100==0)
+					if (frame%500==0)
 					{
 						beam[i].x = 110;
 						beam[i].y = 5 + (rand() % 32);
@@ -729,7 +729,8 @@ int main()
 							Sleep(20);
 							draw_ship(ship.x, ship.y);
 							clear_beam(beam[e].x, beam[e].y);
-							ship.hp = ship.hp - 50;
+							ship.hp = ship.hp - 10;
+							beam[e].status = 0;
 						}
 						else
 						{
@@ -801,7 +802,7 @@ int main()
 
 
 			//gameover
-			if (ship.hp == 0)
+			if (ship.hp <= 0)
 			{
 				clear_screen();
 				frame = 0;
