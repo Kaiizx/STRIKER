@@ -7,6 +7,48 @@
 #include "ScoreBoard.h"
 std::mutex mtx;
 
+struct Bullet
+{
+	int status = 0;
+	int x = 0, y = 0;
+}bs[50];
+
+struct Enemy
+{
+	int hp = 10;
+	int x = 0, y = 0;
+	int status = 0;
+}enemy[10];
+
+struct Enemy2
+{
+	int hp = 30;
+	int x = 0, y = 0;
+	int status = 0;
+}enemy2[10];
+
+struct Missile
+{
+	int hp = 10;
+	int x = 0, y = 0;
+	int dx = 0;
+	int status = 0;
+}missile[5];
+
+struct Beam
+{
+	int x = 0, y = 0;
+	int status = 0;
+}beam[2];
+
+
+
+struct Ship
+{
+	int x = 10, y = 20;
+	int hp = 20;
+	int status = 0;
+}ship;
 void setcursor(bool visible)
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -69,7 +111,9 @@ void clear_pointer(int x, int y)
 
 void draw_ship(int x, int y)
 {
-	setcolor(2, 0);
+	if (ship.status==0){setcolor(2, 0);}
+	if (ship.status == 1) { setcolor(6, 0); }
+	
 	gotoxy(x, y - 1); printf("   _||==0  ");
 	gotoxy(x, y);   printf(" _| ==\\___");
 	gotoxy(x, y + 1); printf("(__0__0___)");
@@ -160,7 +204,13 @@ void draw_heal(int x,int y)
 	gotoxy(x, y); printf("(H)");
 }
 
-void clear_heal(int x, int y)
+void draw_gold(int x, int y)
+{
+	setcolor(6, 0);
+	gotoxy(x, y); printf("(G)");
+}
+
+void clear_item(int x, int y)
 {
 	setcolor(7, 0);
 	gotoxy(x, y); printf("   ");
@@ -264,47 +314,7 @@ int* checkotherenemy(int x, int y)
 	
 }
 
-struct Bullet
-{
-	int status = 0;
-	int x = 0, y = 0;
-}bs[50];
 
-struct Enemy
-{
-	int hp = 10;
-	int x = 0, y = 0;
-	int status = 0;
-}enemy[10];
-
-struct Enemy2
-{
-	int hp = 30;
-	int x = 0, y = 0;
-	int status = 0;
-}enemy2[10];
-
-struct Missile
-{
-	int hp = 10;
-	int x = 0, y = 0;
-	int dx = 0;
-	int status = 0;
-}missile[5];
-
-struct Beam
-{
-	int x = 0, y = 0;
-	int status = 0;
-}beam[2];
-
-
-
-struct Ship 
-{
-	int x = 10, y = 20;
-	int hp = 20;
-}ship;
 
 
 
@@ -358,6 +368,15 @@ struct Heal
 	int status = 0;
 
 }heal;
+
+struct Gold
+{
+	int x = 5;
+	int y = 3;
+	int status = 0;
+	unsigned long time = 0;
+
+}gold;
 
 unsigned long frame = 1;
 int maxenemy = 2;
@@ -445,7 +464,7 @@ int main()
 			}
 			if (ch == ' ' )
 			{
-				if (page == 1 && bs[current].status == 0)
+				if (page == 1 && bs[current].status == 0 && ship.status==0)
 				{
 					bs[current].status = 1;
 					bs[current].x = ship.x + 12;
@@ -501,11 +520,12 @@ int main()
 			{
 				if (enemy[i].status == 0)
 				{
-					enemy[i].x = 90 + (rand() % 17);
+					enemy[i].x = 110;
 					enemy[i].y = 5 + (rand() % 32);
 					checkotherenemy(enemy[i].x, enemy[i].y);
 					draw_enemy(enemy[i].x, enemy[i].y);
 					enemy[i].status = 1;
+					enemy[i].hp = 10;
 				}
 			}
 			//สุ่มเกิด enemy2
@@ -513,7 +533,7 @@ int main()
 			{
 				if (enemy2[i].status == 0)
 				{
-					enemy2[i].x = 90 + (rand() % 17);
+					enemy2[i].x = 110;
 					enemy2[i].y = 5 + (rand() % 32);
 					checkotherenemy(enemy2[i].x, enemy2[i].y);
 					draw_enemy2(enemy2[i].x, enemy2[i].y);
@@ -525,11 +545,13 @@ int main()
 			{
 				if (missile[i].status == 0)
 				{
-					missile[i].x = 90 + (rand() % 17);
-					missile[i].y = 5 + (rand() % 32);
-					checkotherenemy(missile[i].x, missile[i].y);
-					draw_missile(missile[i].x, missile[i].y);
-					missile[i].status = 1;
+					if (frame % 300 == 0)
+					{
+						missile[i].x = 115;
+						missile[i].y = 5 + (rand() % 32);
+						draw_missile(missile[i].x, missile[i].y);
+						missile[i].status = 1;
+					}
 				}
 			}
 			//สุ่มเกิดbeam
@@ -609,18 +631,29 @@ int main()
 					if (enemy[e].x <= 0)//ชนขอบ
 					{
 						clear_enemy(enemy[e].x, enemy[e].y);
-						rerandomenamyafterhit(e);
+						//rerandomenamyafterhit(e);
+						enemy[e].status = 0;
 					}
 					else
 					{
 						if (abs(enemy[e].y - ship.y) <= 2 && abs((enemy[e].x) - (ship.x + 11)) < 2)
 						{
-							erase_ship(ship.x, ship.y);
-							Sleep(20);
-							draw_ship(ship.x, ship.y);
 							clear_enemy(enemy[e].x, enemy[e].y);
-							rerandomenamyafterhit(e);
-							ship.hp = ship.hp - 10;
+							enemy[e].status = 0;
+							if (ship.status == 0)
+							{
+								ship.hp = ship.hp - 10;
+								erase_ship(ship.x, ship.y);
+								Sleep(10);
+								draw_ship(ship.x, ship.y);
+							}
+							if (ship.status==1)
+							{
+								score += 10;
+								ship.hp += 5;
+							}
+							//rerandomenamyafterhit(e);
+							
 						}
 						else
 						{
@@ -639,18 +672,28 @@ int main()
 					if (enemy2[e].x <= 0)//ชนขอบ
 					{
 						clear_enemy(enemy2[e].x, enemy2[e].y);
-						rerandomenamy2afterhit(e);
+						enemy2[e].status = 0;
+						//rerandomenamy2afterhit(e);
 					}
 					else
 					{
-						if (abs(enemy2[e].y - ship.y) <= 2 && abs((enemy2[e].x) - (ship.x + 11)) < 2)
+						if (abs(enemy2[e].y - ship.y) <= 2 && abs((enemy2[e].x) - (ship.x + 11)) < 2)//ชนยาน
 						{
-							erase_ship(ship.x, ship.y);
-							Sleep(20);
-							draw_ship(ship.x, ship.y);
 							clear_enemy(enemy2[e].x, enemy2[e].y);
-							rerandomenamy2afterhit(e);
-							ship.hp = ship.hp - 10;
+							enemy2[e].status = 0;
+							if (ship.status == 0)
+							{
+								ship.hp = ship.hp - 10;
+								erase_ship(ship.x, ship.y);
+								Sleep(10);
+								draw_ship(ship.x, ship.y);
+							}
+							if (ship.status == 1)//gold
+							{
+								score += 10;
+								ship.hp += 5;
+							}
+							//rerandomenamy2afterhit(e);
 						}
 						else
 						{
@@ -669,18 +712,28 @@ int main()
 					if (missile[e].x <= 0)//ชนขอบ
 					{
 						clear_missile(missile[e].x, missile[e].y);
-						rerandommissileafterhit(e);
+						missile[e].status = 0;
+						//rerandommissileafterhit(e);
 					}
 					else
 					{
 						if (abs(missile[e].y - ship.y) <= 1 && abs((missile[e].x) - (ship.x + 11)) < 2)
 						{
-							erase_ship(ship.x, ship.y);
-							Sleep(20);
-							draw_ship(ship.x, ship.y);
 							clear_missile(missile[e].x, missile[e].y);
-							rerandommissileafterhit(e);
-							ship.hp -= 10;
+							missile[e].status = 0;
+							if (ship.status == 0)
+							{
+								ship.hp = ship.hp - 10;
+								erase_ship(ship.x, ship.y);
+								Sleep(10);
+								draw_ship(ship.x, ship.y);
+							}
+							if (ship.status == 1)//gold
+							{
+								score += 10;
+								ship.hp += 5;
+							}
+							//rerandommissileafterhit(e);
 						}
 						else
 						{
@@ -689,7 +742,7 @@ int main()
 								if (frame % 7 == 0)
 								{
 									clear_missile(missile[e].x, missile[e].y);
-									if (missile[e].dx < 3)
+									if (missile[e].dx < 5)
 									{
 										draw_missile(--missile[e].x, missile[e].y); missile[e].dx += 1;
 									}
@@ -730,12 +783,20 @@ int main()
 					{
 						if (abs(beam[e].y - ship.y) <= 2 && abs((beam[e].x) - (ship.x + 11)) < 2)
 						{
-							erase_ship(ship.x, ship.y);
-							Sleep(20);
-							draw_ship(ship.x, ship.y);
 							clear_beam(beam[e].x, beam[e].y);
-							ship.hp = ship.hp - 10;
 							beam[e].status = 0;
+							if (ship.status == 0)
+							{
+								ship.hp = ship.hp - 10;
+								erase_ship(ship.x, ship.y);
+								Sleep(10);
+								draw_ship(ship.x, ship.y);
+							}
+							if (ship.status == 1)//gold
+							{
+								score += 10;
+								ship.hp += 5;
+							}
 						}
 						else
 						{
@@ -746,35 +807,80 @@ int main()
 			}
 			
 			//item drop 
-			if (frame % 1000 == 0 && heal.status == 0)
+			if (frame % 700 == 0 && heal.status == 0)
 			{
 				heal.x = 40 + (rand() % 20);
 				heal.y = 2 + (rand() % 3);
 				draw_heal(heal.x, heal.y);
 				heal.status = 1;
 			}
+
+			if (frame % 2000 == 0 && gold.status == 0)
+			{
+				gold.x = 40 + (rand() % 20);
+				gold.y = 2 + (rand() % 3);
+				draw_gold(gold.x, gold.y);
+				gold.status = 1;
+			}
+			//heal
 			if (heal.status == 1)
 			{
 				if (heal.y >= 38)
 				{
-					clear_heal(heal.x, heal.y);
+					clear_item(heal.x, heal.y);
 					heal.status = 0;
 				}
 				else
 				{
 					if (frame % 30 == 0)
 					{
-						clear_heal(heal.x, heal.y);
+						clear_item(heal.x, heal.y);
 						draw_heal(heal.x, ++heal.y);
 					}
-					if (abs(heal.y - ship.y) < 3 && abs((ship.x + 6) - heal.x) < 6)
+					if (abs(heal.y - ship.y) < 4 && abs((ship.x + 6) - heal.x) < 7)
 					{
-						clear_heal(heal.x, heal.y);
+						clear_item(heal.x, heal.y);
 						ship.hp = ship.hp + 10;
 						heal.status = 0;
 					}
 				}
 			}
+			//gold
+			if (gold.status == 1)
+			{
+				if (gold.y >= 38)
+				{
+					clear_item(gold.x, gold.y);
+					gold.status = 0;
+				}
+				else
+				{
+					if (frame % 30 == 0)
+					{
+						clear_item(gold.x, gold.y);
+						draw_gold(gold.x, ++gold.y);
+					}
+					if (abs(gold.y - ship.y) < 4 && abs((ship.x + 6) - gold.x) < 7)
+					{
+						clear_item(gold.x, gold.y);
+						ship.status = 1;
+						gold.status = 0;
+						gold.time = frame;
+					}
+				}
+			}
+
+			//shipstatus
+			if (ship.status==1)//gold
+			{
+				if (frame - gold.time > 800)
+				{
+					ship.status = 0;
+					gold.time = 0;
+				}
+			}
+
+
 			//if (score > changelevel) { level++; maxenemy++; changelevel += 100; }
 
 

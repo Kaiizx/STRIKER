@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 struct ScoreData
 {
 	char name[20];
