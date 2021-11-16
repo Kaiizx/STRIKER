@@ -1,4 +1,9 @@
-﻿
+﻿#include <stdio.h>
+#include <conio.h>
+#include <windows.h>
+#include <time.h>
+#include <thread>
+#include <mutex>
 #include "ScoreBoard.h"
 std::mutex mtx;
 
