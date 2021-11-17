@@ -503,6 +503,7 @@ int main()
 		}
 		if (page == 0)//menu 
 		{
+			print_pointer(pointx,pointy);
 			print_menu();
 		}
 		if (page == 1)//gamestart
@@ -568,9 +569,7 @@ int main()
 					}
 				}
 			}
-			
 
-			
 			//bullet 
 
 			for (int i = 0; i < 50; i++)
@@ -885,10 +884,10 @@ int main()
 
 
 			//changelevel
-			if (enemycount == 5)
+			if (score > changelevel)
 			{
 				level++;
-				enemycount = 0;
+				changelevel += 100;
 			}
 			if (level == 2)
 			{
@@ -908,6 +907,17 @@ int main()
 				maxenemy = 4;
 				maxenemy2 = 4;
 				maxmissile = 5;
+			}
+			if (level==6)
+			{
+				for (int i = 0; i < maxenemy; i++)
+				{
+					enemy[i].hp = 30;
+				}
+				for (int i = 0; i < maxenemy2; i++)
+				{
+					enemy2[i].hp = 50;
+				}
 			}
 
 
