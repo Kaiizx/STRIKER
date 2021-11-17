@@ -7,7 +7,7 @@
 #include "ScoreBoard.h"
 
 #define _WIN32_WINNT 0x500
-#define screen_x 100
+#define screen_x 120
 #define screen_y 40
 
 HANDLE wHnd;
@@ -31,6 +31,7 @@ struct Enemy
 	int hp = 10;
 	int x = 0, y = 0;
 	int status = 0;
+	int dmg = 10;
 }enemy[10];
 
 struct Enemy2
@@ -38,6 +39,7 @@ struct Enemy2
 	int hp = 30;
 	int x = 0, y = 0;
 	int status = 0;
+	int dmg = 10;
 }enemy2[10];
 
 struct Missile
@@ -521,6 +523,7 @@ int main()
 		}
 		if (page == 1)//gamestart
 		{
+			
 			//clear_menu();
 			//clear_pointer(pointx,pointy);
 			draw_ship(ship.x, ship.y);
@@ -611,6 +614,7 @@ int main()
 								enemycount += 1;
 								clear_enemy(enemy[e].x, enemy[e].y);
 								score += 10;
+								//enemy[e].status = 0;
 								rerandomenamyafterhit(e);
 							}
 						}
@@ -628,6 +632,7 @@ int main()
 								enemycount += 1;
 								clear_enemy(enemy2[e].x, enemy2[e].y);
 								score += 10;
+								//enemy2[e].status = 0;
 								rerandomenamy2afterhit(e);
 							}
 						}
@@ -654,7 +659,7 @@ int main()
 							enemy[e].status = 0;
 							if (ship.status == 0)
 							{
-								ship.hp = ship.hp - 10;
+								ship.hp = ship.hp - enemy[e].dmg;
 								erase_ship(ship.x, ship.y);
 								Sleep(10);
 								draw_ship(ship.x, ship.y);
@@ -695,7 +700,7 @@ int main()
 							enemy2[e].status = 0;
 							if (ship.status == 0)
 							{
-								ship.hp = ship.hp - 10;
+								ship.hp = ship.hp - enemy2[e].dmg;
 								erase_ship(ship.x, ship.y);
 								Sleep(10);
 								draw_ship(ship.x, ship.y);
@@ -901,40 +906,27 @@ int main()
 			{
 				level++;
 				changelevel += 100;
-			}
-			if (level == 2)
-			{
-				maxenemy = 3;
-			}
-			if (level == 3)
-			{
-				maxenemy2 = 1;
-			}
-			if (level == 4)
-			{
-				maxenemy = 3;
-				maxenemy2 = 2;
-			}
-			if (level == 5)
-			{
-				maxenemy = 4;
-				maxenemy2 = 4;
-				maxmissile = 5;
-			}
-			if (level==6)
-			{
-				for (int i = 0; i < maxenemy; i++)
+
+				if (level == 2)
 				{
-					enemy[i].hp = 30;
+					maxenemy = 3;
 				}
-				for (int i = 0; i < maxenemy2; i++)
+				if (level == 3)
 				{
-					enemy2[i].hp = 50;
+					maxenemy2 = 1;
+				}
+				if (level == 4)
+				{
+					maxenemy = 3;
+					maxenemy2 = 2;
+				}
+				if (level == 5)
+				{
+					maxenemy = 4;
+					maxenemy2 = 4;
+					maxmissile = 5;
 				}
 			}
-
-
-
 			//gameover
 			if (ship.hp <= 0)
 			{
@@ -976,7 +968,6 @@ int main()
 			ship.hp = 20;
 			score = 0;
 			level = 0;
-
 		}
 
 	} while (ch != 'x');
