@@ -5,6 +5,19 @@
 #include <thread>
 #include <mutex>
 #include "ScoreBoard.h"
+
+#define _WIN32_WINNT 0x500
+#define screen_x 100
+#define screen_y 40
+
+HANDLE wHnd;
+HANDLE rHnd;
+DWORD fdwMode;
+COORD bufferSize = { screen_x,screen_y };
+SMALL_RECT windowSize = { 0,0,screen_x - 1,screen_y - 1 };
+CHAR_INFO consoleBuffer[screen_x * screen_y];
+
+
 std::mutex mtx;
 
 struct Bullet
