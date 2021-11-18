@@ -11,15 +11,29 @@
 
 HANDLE wHnd;
 COORD bufferSize = { screen_x,screen_y };
-SMALL_RECT windowSize = { 0,0,screen_x - 1,screen_y - 1 };
+SMALL_RECT windowSize = { 0,0,screen_x-1,screen_y-1 };
 
 
 
-std::mutex mtx;
 
-void beep(int del)
+
+
+void getItemSound()
 {
-	Beep(700, del);
+	Beep(900, 70);
+	Beep(1000, 70);
+}
+
+void HitSound()
+{
+	Beep(400, 70);
+	Beep(300, 70);
+}
+
+void BsHit()
+{
+	Beep(600,70);
+	Beep(700, 70);
 }
 
 struct Bullet
@@ -128,12 +142,27 @@ void gotoxy(int x, int y)
 		GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
 
+void border()
+{
+	setcolor(0, 7);
+	for (int i = 0; i < 120; i++)
+	{
+		gotoxy(i, 3); printf(" ");
+		gotoxy(i, 39); printf(" ");
+	}
+	for (int j = 4; j < 39; j++)
+	{
+		gotoxy(0, j); printf(" ");
+		gotoxy(119, j); printf(" ");
+	}
+}
+
 void clear_screen()
 {
 	setcolor(7, 0);
-	for ( int i = 0; i <= 120; i++)
+	for ( int i = 1; i < 119; i++)
 	{
-		for (int j = 0; j <=40 ; j++)
+		for (int j = 4; j < 39 ; j++)
 		{
 			gotoxy(i, j); printf(" ");
 		}
@@ -402,7 +431,7 @@ int newex, newey;
 int* rnewxy;
 void rerandomenamyafterhit(int c) {
 	enemy[c].status = 0;
-	newex = 110;
+	newex = 106;
 	newey = 5 + (rand() % 32);
 	rnewxy = checkotherenemy(newex, newey);
 	enemy[c].x = *(rnewxy + 0);
@@ -419,7 +448,7 @@ void rerandomenamyafterhit(int c) {
 
 void rerandomenamy2afterhit(int c) {
 	enemy2[c].status = 0;
-	newex = 110;
+	newex = 106;
 	newey = 5 + (rand() % 32);
 	rnewxy = checkotherenemy(newex, newey);
 	enemy2[c].x = *(rnewxy + 0);
@@ -489,6 +518,7 @@ int main()
 	setcursor(0);
 	srand(time(NULL));
 	setConsole(screen_x, screen_y);
+	border();
 	do {
 		if (_kbhit()) {
 			ch = _getch();
@@ -548,10 +578,11 @@ int main()
 					if (pointy == 18) { pointx = 53; }
 					if (pointy == 20) { pointx = 49; }
 					print_pointer(pointx, pointy);
+					
 				}
 				if (page == 1)
 				{
-					if (ship.y > 2)
+					if (ship.y > 5)
 					{
 						erase_ship(ship.x, ship.y);
 						draw_ship(ship.x, --ship.y);
@@ -613,6 +644,7 @@ int main()
 		}
 		if (page == 0)//menu 
 		{
+			
 			print_pointer(pointx,pointy);
 			print_menu();
 		}
@@ -620,6 +652,7 @@ int main()
 		{
 			//clear_menu();
 			//clear_pointer(pointx,pointy);
+			
 			draw_ship(ship.x, ship.y);
 			print_score(score);
 			print_hp(ship.hp);
@@ -630,7 +663,7 @@ int main()
 			{
 				if (enemy[i].status == 0)
 				{
-					enemy[i].x = 110;
+					enemy[i].x = 106;
 					enemy[i].y = 5 + (rand() % 32);
 					checkotherenemy(enemy[i].x, enemy[i].y);
 					draw_enemy(enemy[i].x, enemy[i].y);
@@ -648,7 +681,7 @@ int main()
 			{
 				if (enemy2[i].status == 0)
 				{
-					enemy2[i].x = 110;
+					enemy2[i].x = 106;
 					enemy2[i].y = 5 + (rand() % 32);
 					checkotherenemy(enemy2[i].x, enemy2[i].y);
 					draw_enemy2(enemy2[i].x, enemy2[i].y);
@@ -667,7 +700,7 @@ int main()
 				{
 					if (frame % 300 == 0)
 					{
-						missile[i].x = 115;
+						missile[i].x = 114;
 						missile[i].y = 5 + (rand() % 32);
 						draw_missile(missile[i].x, missile[i].y);
 						missile[i].status = 1;
@@ -685,7 +718,7 @@ int main()
 				{
 					if (frame%500==0)
 					{
-						beam[i].x = 110;
+						beam[i].x = 114;
 						beam[i].y = 5 + (rand() % 32);
 						draw_beam(beam[i].x, beam[i].y);
 						beam[i].status = 1;
@@ -704,7 +737,7 @@ int main()
 				if (bs[i].status == 1)
 				{
 					clear_bullet(bs[i].x, bs[i].y);
-					if (bs[i].x >= 116)
+					if (bs[i].x > 114)
 					{
 						bs[i].status = 0;
 					}
@@ -716,6 +749,7 @@ int main()
 							if (abs(enemy[e].y - bs[i].y) <= 1 && abs((enemy[e].x + 5) - (bs[i].x + 4)) < 5)
 							{
 								clear_bullet(bs[i].x, bs[i].y);
+
 								enemy[e].hp -= 10;
 								bs[i].status = 0;
 
@@ -723,6 +757,8 @@ int main()
 							if (enemy[e].hp == 0)
 							{
 								clear_enemy(enemy[e].x, enemy[e].y);
+								std::thread q(BsHit);
+								q.detach();
 								score += 10;
 								//enemy[e].status = 0;
 								rerandomenamyafterhit(e);
@@ -733,6 +769,8 @@ int main()
 							if (abs(enemy2[e].y - bs[i].y) <= 1 && abs((enemy2[e].x + 5) - (bs[i].x + 4)) < 5)
 							{
 								clear_bullet(bs[i].x, bs[i].y);
+								std::thread q(BsHit);
+								q.detach();
 								enemy2[e].hp -= 10;
 								bs[i].status = 0;
 
@@ -754,7 +792,7 @@ int main()
 			for (int e = 0; e < maxenemy; e++)
 			{
 				if (enemy[e].status == 1) {
-					if (enemy[e].x <= 0)//ชนขอบ
+					if (enemy[e].x <= 1)//ชนขอบ
 					{
 						clear_enemy(enemy[e].x, enemy[e].y);
 						//rerandomenamyafterhit(e);
@@ -771,12 +809,14 @@ int main()
 								ship.hp = ship.hp - enemy[e].dmg;
 								std::thread p(flashing,ship.x,ship.y);
 								p.detach();
-								std::thread q(beep, 500);
+								std::thread q(HitSound);
 								q.detach();
 								
 							}
 							if (ship.status==1)
 							{
+								std::thread q(BsHit);
+								q.detach();
 								score += 10;
 								ship.hp += 5;
 							}
@@ -800,7 +840,7 @@ int main()
 					if (enemy2[e].x <= 0)//ชนขอบ
 					{
 						clear_enemy(enemy2[e].x, enemy2[e].y);
-						enemy2[e].status = 0;
+						enemy2[e].status = 1;
 						//rerandomenamy2afterhit(e);
 					}
 					else
@@ -814,11 +854,13 @@ int main()
 								ship.hp = ship.hp - enemy2[e].dmg;
 								std::thread p(flashing, ship.x, ship.y);
 								p.detach();
-								std::thread q(beep, 500);
+								std::thread q(HitSound);
 								q.detach();
 							}
 							if (ship.status == 1)//gold
 							{
+								std::thread q(BsHit);
+								q.detach();
 								score += 10;
 								ship.hp += 5;
 							}
@@ -838,7 +880,7 @@ int main()
 			for (int e = 0; e < maxmissile; e++)
 			{
 				if (missile[e].status == 1) {
-					if (missile[e].x <= 0)//ชนขอบ
+					if (missile[e].x <= 1)//ชนขอบ
 					{
 						clear_missile(missile[e].x, missile[e].y);
 						missile[e].status = 0;
@@ -855,11 +897,13 @@ int main()
 								ship.hp = ship.hp - 10;
 								std::thread p(flashing, ship.x, ship.y);
 								p.detach();
-								std::thread q(beep, 500);
+								std::thread q(HitSound);
 								q.detach();
 							}
 							if (ship.status == 1)//gold
 							{
+								std::thread q(BsHit);
+								q.detach();
 								score += 10;
 								ship.hp += 5;
 							}
@@ -920,11 +964,13 @@ int main()
 								ship.hp = ship.hp - 10;
 								std::thread p(flashing, ship.x, ship.y);
 								p.detach();
-								std::thread q(beep, 500);
+								std::thread q(HitSound);
 								q.detach();
 							}
 							if (ship.status == 1)//gold
 							{
+								std::thread q(BsHit);
+								q.detach();
 								score += 10;
 								ship.hp += 5;
 							}
@@ -940,16 +986,16 @@ int main()
 			//item drop 
 			if (frame % 700 == 0 && heal.status == 0)
 			{
-				heal.x = 40 + (rand() % 20);
-				heal.y = 2 + (rand() % 3);
+				heal.x = 20 + (rand() % 70);
+				heal.y = 4;
 				draw_heal(heal.x, heal.y);
 				heal.status = 1;
 			}
 
 			if (frame % 2000 == 0 && gold.status == 0)
 			{
-				gold.x = 40 + (rand() % 20);
-				gold.y = 2 + (rand() % 3);
+				gold.x = 20 + (rand() % 70);
+				gold.y = 4;
 				draw_gold(gold.x, gold.y);
 				gold.status = 1;
 			}
@@ -971,6 +1017,8 @@ int main()
 					if (abs(heal.y - ship.y) < 4 && abs((ship.x + 6) - heal.x) < 7)
 					{
 						clear_item(heal.x, heal.y);
+						std::thread q(getItemSound);
+						q.detach();
 						ship.hp = ship.hp + 10;
 						heal.status = 0;
 					}
@@ -994,6 +1042,8 @@ int main()
 					if (abs(gold.y - ship.y) < 4 && abs((ship.x + 6) - gold.x) < 7)
 					{
 						clear_item(gold.x, gold.y);
+						std::thread q(getItemSound);
+						q.detach();
 						ship.status = 1;
 						gold.status = 0;
 						gold.time = frame;
