@@ -69,8 +69,6 @@ struct Beam
 	int dmg = 10;
 }beam[2];
 
-
-
 struct Ship
 {
 	int x = 10, y = 20;
@@ -91,7 +89,10 @@ struct Gold
 	int x = 5;
 	int y = 3;
 	int status = 0;
-	unsigned long time = 0;
+	int time = 0;
+	int timer = 0;
+	int retimer = 43;
+
 
 }gold;
 
@@ -110,6 +111,7 @@ char name[20];
 int mycolor = 2;
 int hpbar=0;
 int oldhpbar = 40;
+int gbstatus = 0;
 
 int setConsole(int x, int y)
 {
@@ -169,7 +171,6 @@ void clear_screen()
 			{
 				gotoxy(i, j); printf(" ");
 			}
-			
 		}
 	}
 }
@@ -373,7 +374,6 @@ void print_hp(int x)
 
 void hp_bar(int x)
 {
-
 	setcolor(2,0);
 	gotoxy(0, 0); printf("HP :");
 	hpbar= x / 10;
@@ -392,6 +392,17 @@ void hp_bar(int x)
 		gotoxy(4 + i, 0); printf(" ");
 	}
 	oldhpbar = hpbar;
+}
+
+void gold_bar()
+{
+	setcolor(6, 0);
+	gotoxy(0, 1); printf("GT :");
+	for (int i = 0; i < 39; i++)
+	{
+		setcolor(6, 6);
+		gotoxy(4 + i, 1); printf(" ");
+	}
 }
 
 
@@ -503,7 +514,7 @@ void rerandommissileafterhit(int c) {
 void reset()
 {
 	clear_screen();
-	frame = 1;
+	frame = 0;
 	level = 1;
 	ship.hp = 50;
 	score = 0;
@@ -668,6 +679,7 @@ int main()
 				{
 					clear_screen();
 					page = 0;
+					gbstatus == 0;
 				}
 			}
 			fflush(stdin);
@@ -683,8 +695,8 @@ int main()
 			draw_ship(ship.x, ship.y);
 			hp_bar(ship.hp);
 			print_score(score);
-			print_hp(ship.hp);
-			print_level(level);
+			//print_hp(ship.hp);
+			//print_level(level);
 			print_frame(frame);
 			//สุ่มเกิดศัตรู
 			for (i = 0; i < maxenemy; i++)
@@ -1020,7 +1032,7 @@ int main()
 				heal.status = 1;
 			}
 
-			if (frame % 3500 == 0 && gold.status == 0)
+			if (frame % 1000 == 0 && gold.status == 0)
 			{
 				gold.x = 20 + (rand() % 70);
 				gold.y = 4;
@@ -1077,6 +1089,7 @@ int main()
 						ship.status = 1;
 						gold.status = 0;
 						gold.time = frame;
+						gold.timer = frame;
 					}
 				}
 			}
@@ -1084,10 +1097,25 @@ int main()
 			//shipstatus
 			if (ship.status==1)//gold
 			{
+				if (gbstatus==0)
+				{
+					gold_bar();
+					gbstatus = 1;
+				}
+				if (frame - gold.timer > 20)
+				{
+					setcolor(6, 0);
+					gotoxy(gold.retimer, 1); printf(" ");
+					gold.timer = frame;
+					gold.retimer--;
+				}
 				if (frame - gold.time > 800)
 				{
 					ship.status = 0;
 					gold.time = 0;
+					gbstatus = 0;
+					gold.retimer = 43;
+					setcolor(6, 0); gotoxy(0, 1); printf("         ");
 				}
 			}
 
