@@ -14,27 +14,23 @@ COORD bufferSize = { screen_x,screen_y };
 SMALL_RECT windowSize = { 0,0,screen_x-1,screen_y-1 };
 
 
-
-
-
-
 void getItemSound()
 {
-	Beep(900, 70);
-	Beep(1000, 70);
+	Beep(1200, 25);
+	Beep(900, 25);
+	
 }
 
 void HitSound()
 {
-	Beep(400, 70);
-	Beep(300, 70);
+	Beep(400, 50);
 }
 
 void BsHit()
 {
-	Beep(600,70);
-	Beep(700, 70);
+	Beep(1000, 100);
 }
+
 
 struct Bullet
 {
@@ -110,7 +106,7 @@ int changelevel = 100;
 int level = 1;
 int page = 0;
 int pointer = 1;
-int pointx = 49, pointy = 20;
+int pointx = 50, pointy = 20;
 char name[20];
 int mycolor = 2;
 
@@ -176,7 +172,7 @@ void print_menu()
 	{
 		gotoxy(57, 18); printf("RESUME");
 	}
-	gotoxy(53, 20); printf("START NEW GAME");
+	gotoxy(54, 20); printf("START NEW GAME");
 	gotoxy(55, 22); printf("SCORE BOARD");
 	gotoxy(48, 30); printf("PRESS SPACEBAR TO SELECT");
 }
@@ -349,19 +345,11 @@ char attribute(int x, int y) {
 
 }
 
-
-
 int score = 0;
 void print_score(int x)
 {
-	setcolor(2, 0);
-	gotoxy(109, 0); printf("Score : %d", x);
-	if (x >= 1000)
-	{
-		gotoxy(109, 0); printf("          ");
-		gotoxy(108, 0); printf("Score : %d", x);
-	}
-	
+	setcolor(7, 0);
+	gotoxy(108, 0); printf("Score : %d", x);
 }
 
 
@@ -549,9 +537,11 @@ int main()
 			{
 				if (page == 0)
 				{
+					std::thread q(HitSound);
+					q.detach();
 					clear_pointer(pointx, pointy);
 					if (pointy != 22) { pointy = pointy + 2; }
-					if (pointy == 20) { pointx = 49; }
+					if (pointy == 20) { pointx = 50; }
 					if (pointy == 22) { pointx = 51; }
 					print_pointer(pointx, pointy);
 				}
@@ -569,6 +559,8 @@ int main()
 			{
 				if (page == 0)
 				{
+					std::thread q(HitSound);
+					q.detach();
 					clear_pointer(pointx, pointy);
 					if (frame == 1)
 					{
@@ -576,7 +568,7 @@ int main()
 					}
 					else { if (pointy != 18) { pointy = pointy - 2; }  }
 					if (pointy == 18) { pointx = 53; }
-					if (pointy == 20) { pointx = 49; }
+					if (pointy == 20) { pointx = 50; }
 					print_pointer(pointx, pointy);
 					
 				}
@@ -601,6 +593,8 @@ int main()
 				}
 				if (page == 0)
 				{
+					std::thread q(BsHit);
+					q.detach();
 					if (pointy == 18)//point_resume
 					{
 						clear_screen();
@@ -650,9 +644,6 @@ int main()
 		}
 		if (page == 1)//gamestart
 		{
-			//clear_menu();
-			//clear_pointer(pointx,pointy);
-			
 			draw_ship(ship.x, ship.y);
 			print_score(score);
 			print_hp(ship.hp);
@@ -669,7 +660,7 @@ int main()
 					draw_enemy(enemy[i].x, enemy[i].y);
 					enemy[i].status = 1;
 					//enemy[i].hp = 10;
-					if (level>=7)
+					if (level>=10)
 					{
 						enemy[i].hp = 30;
 						enemy[i].dmg = 20;
@@ -686,7 +677,7 @@ int main()
 					checkotherenemy(enemy2[i].x, enemy2[i].y);
 					draw_enemy2(enemy2[i].x, enemy2[i].y);
 					enemy2[i].status = 1;
-					if (level >= 7)
+					if (level >= 10)
 					{
 						enemy2[i].hp = 50;
 						enemy2[i].dmg = 30;
@@ -704,7 +695,7 @@ int main()
 						missile[i].y = 5 + (rand() % 32);
 						draw_missile(missile[i].x, missile[i].y);
 						missile[i].status = 1;
-						if (level >= 7)
+						if (level >= 10)
 						{
 							missile[i].dmg = 20;
 						}
@@ -722,7 +713,7 @@ int main()
 						beam[i].y = 5 + (rand() % 32);
 						draw_beam(beam[i].x, beam[i].y);
 						beam[i].status = 1;
-						if (level >= 7)
+						if (level >= 10)
 						{
 							beam[i].dmg =30;
 						}
@@ -837,10 +828,10 @@ int main()
 			for (int e = 0; e < maxenemy2; e++)
 			{
 				if (enemy2[e].status == 1) {
-					if (enemy2[e].x <= 0)//ชนขอบ
+					if (enemy2[e].x <= 1)//ชนขอบ
 					{
 						clear_enemy(enemy2[e].x, enemy2[e].y);
-						enemy2[e].status = 1;
+						enemy2[e].status = 0;
 						//rerandomenamy2afterhit(e);
 					}
 					else
@@ -984,7 +975,7 @@ int main()
 			}
 			
 			//item drop 
-			if (frame % 700 == 0 && heal.status == 0)
+			if (frame % 1200 == 0 && heal.status == 0)
 			{
 				heal.x = 20 + (rand() % 70);
 				heal.y = 4;
@@ -992,7 +983,7 @@ int main()
 				heal.status = 1;
 			}
 
-			if (frame % 2000 == 0 && gold.status == 0)
+			if (frame % 3500 == 0 && gold.status == 0)
 			{
 				gold.x = 20 + (rand() % 70);
 				gold.y = 4;
@@ -1019,7 +1010,7 @@ int main()
 						clear_item(heal.x, heal.y);
 						std::thread q(getItemSound);
 						q.detach();
-						ship.hp = ship.hp + 10;
+						ship.hp = ship.hp + (level*20);
 						heal.status = 0;
 					}
 				}
