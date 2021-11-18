@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <time.h>
 #include <thread>
-#include <mutex>
 #include "ScoreBoard.h"
 
 #define screen_x 120
@@ -109,6 +108,8 @@ int pointer = 1;
 int pointx = 50, pointy = 20;
 char name[20];
 int mycolor = 2;
+int hpbar=0;
+int oldhpbar = 40;
 
 int setConsole(int x, int y)
 {
@@ -156,11 +157,19 @@ void border()
 void clear_screen()
 {
 	setcolor(7, 0);
+	gotoxy(0, 0); printf(" ");
+	gotoxy(0, 1); printf(" ");
+	gotoxy(119, 0); printf(" ");
+	gotoxy(119, 1); printf(" ");
 	for ( int i = 1; i < 119; i++)
 	{
-		for (int j = 4; j < 39 ; j++)
+		for (int j = 0; j < 39 ; j++)
 		{
-			gotoxy(i, j); printf(" ");
+			if (j!=3)
+			{
+				gotoxy(i, j); printf(" ");
+			}
+			
 		}
 	}
 }
@@ -349,21 +358,48 @@ int score = 0;
 void print_score(int x)
 {
 	setcolor(7, 0);
-	gotoxy(108, 0); printf("Score : %d", x);
+	gotoxy(115, 0); printf("     ");
+	if (x > 1000){ gotoxy(108, 0); printf("Score : %d", x);}
+	else { gotoxy(109, 0); printf("Score : %d", x); }
 }
 
 
 void print_hp(int x)
 {
 	setcolor(4, 0);
-	gotoxy(4, 0); printf("    ", x);
-	gotoxy(0, 0); printf("HP : %d ", x);
+	gotoxy(4, 1); printf("    ");
+	gotoxy(0, 1); printf("HP : %d ", x);
 }
+
+void hp_bar(int x)
+{
+
+	setcolor(2,0);
+	gotoxy(0, 0); printf("HP :");
+	hpbar= x / 10;
+	
+	if (oldhpbar > hpbar)
+	{
+		for (int i = hpbar; i <= oldhpbar; i++)
+		{
+			setcolor(0, 0);
+			gotoxy(4 + i, 0); printf(" ");
+		}
+	}
+	for (int i = 0; i <= hpbar; i++)
+	{
+		setcolor(0, 2);
+		gotoxy(4 + i, 0); printf(" ");
+	}
+	oldhpbar = hpbar;
+}
+
 
 void print_level(int x)
 {
 	setcolor(4, 0);
-	gotoxy(10, 0); printf("Level : %d", x);
+	gotoxy(17, 1); printf("   ");
+	gotoxy(10, 1); printf("Level : %d", x);
 }
 
 void print_frame(int x)
@@ -645,6 +681,7 @@ int main()
 		if (page == 1)//gamestart
 		{
 			draw_ship(ship.x, ship.y);
+			hp_bar(ship.hp);
 			print_score(score);
 			print_hp(ship.hp);
 			print_level(level);
@@ -1010,7 +1047,9 @@ int main()
 						clear_item(heal.x, heal.y);
 						std::thread q(getItemSound);
 						q.detach();
-						ship.hp = ship.hp + (level*20);
+						int healing =level*20;
+						if (level < 10) { ship.hp = ship.hp + healing; }
+						else { ship.hp += 200; }
 						heal.status = 0;
 					}
 				}
@@ -1041,7 +1080,7 @@ int main()
 					}
 				}
 			}
-
+			
 			//shipstatus
 			if (ship.status==1)//gold
 			{
@@ -1052,8 +1091,11 @@ int main()
 				}
 			}
 
+			if (ship.hp > 500) { ship.hp = 500; }
 
-			//if (score > changelevel) { level++; maxenemy++; changelevel += 100; }
+
+
+			
 
 
 			//changelevel
