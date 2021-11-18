@@ -28,9 +28,9 @@ struct Bullet
 
 struct Enemy
 {
-	int hp = 10;
 	int x = 0, y = 0;
 	int status = 0;
+	int hp = 10;
 	int dmg = 10;
 }enemy[10];
 
@@ -48,12 +48,14 @@ struct Missile
 	int x = 0, y = 0;
 	int dx = 0;
 	int status = 0;
+	int dmg = 10;
 }missile[5];
 
 struct Beam
 {
 	int x = 0, y = 0;
 	int status = 0;
+	int dmg = 10;
 }beam[2];
 
 
@@ -64,6 +66,19 @@ struct Ship
 	int hp = 20;
 	int status = 0;
 }ship;
+
+unsigned long frame = 1;
+int maxenemy = 2;
+int maxenemy2 = 0;
+int maxmissile = 3;
+int maxmissile2 = 2;
+int changelevel = 100;
+int page = 0;
+int pointer = 1;
+int pointx = 46, pointy = 20;
+int level = 1;
+
+char name[20];
 void setcursor(bool visible)
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -264,6 +279,12 @@ void print_score(int x)
 {
 	setcolor(2, 0);
 	gotoxy(109, 0); printf("Score : %d", x);
+	if (x >= 1000)
+	{
+		gotoxy(109, 0); printf("          ");
+		gotoxy(108, 0); printf("Score : %d", x);
+	}
+	
 }
 
 
@@ -340,7 +361,7 @@ int newex, newey;
 int* rnewxy;
 void rerandomenamyafterhit(int c) {
 	enemy[c].status = 0;
-	newex = 90 + (rand() % 17);
+	newex = 110;
 	newey = 5 + (rand() % 32);
 	rnewxy = checkotherenemy(newex, newey);
 	enemy[c].x = *(rnewxy + 0);
@@ -348,11 +369,16 @@ void rerandomenamyafterhit(int c) {
 	draw_enemy(enemy[c].x, enemy[c].y);
 	enemy[c].status = 1;
 	enemy[c].hp = 10;
+	if (level >= 7)
+	{
+		enemy[c].hp = 30;
+		enemy[c].dmg = 20;
+	}
 }
 
 void rerandomenamy2afterhit(int c) {
 	enemy2[c].status = 0;
-	newex = 90 + (rand() % 17);
+	newex = 110;
 	newey = 5 + (rand() % 32);
 	rnewxy = checkotherenemy(newex, newey);
 	enemy2[c].x = *(rnewxy + 0);
@@ -360,20 +386,24 @@ void rerandomenamy2afterhit(int c) {
 	draw_enemy2(enemy2[c].x, enemy2[c].y);
 	enemy2[c].status = 1;
 	enemy2[c].hp = 30;
+	if (level >= 7)
+	{
+		enemy2[c].hp = 50;
+		enemy2[c].dmg = 30;
+	}
 }
 
 int newmx, newmy;
 int* rnewmxy;
 void rerandommissileafterhit(int c) {
 	missile[c].status = 0;
-	newmx = 90 + (rand() % 17);
+	newmx = 110;
 	newmy = 5 + (rand() % 32);
 	rnewmxy = checkotherenemy(newmx, newmy);
 	missile[c].x = *(rnewmxy + 0);
 	missile[c].y = *(rnewmxy + 1);
 	draw_missile(missile[c].x, missile[c].y);
 	missile[c].status = 1;
-	missile[c].hp = 10;
 }
 
 struct Heal
@@ -393,18 +423,7 @@ struct Gold
 
 }gold;
 
-unsigned long frame = 1;
-int maxenemy = 2;
-int maxenemy2 = 0;
-int maxmissile = 3;
-int maxmissile2 = 2;
-int changelevel = 100;
-int page = 0;
-int pointer = 1;
-int pointx = 46, pointy = 20;
-int level = 1;
 
-char name[20];
 
 int main()
 {
@@ -523,7 +542,6 @@ int main()
 		}
 		if (page == 1)//gamestart
 		{
-			
 			//clear_menu();
 			//clear_pointer(pointx,pointy);
 			draw_ship(ship.x, ship.y);
@@ -531,7 +549,6 @@ int main()
 			print_hp(ship.hp);
 			print_level(level);
 			print_frame(frame);
-			setcolor(4, 0); gotoxy(70, 0); printf("count : %d", counter);
 			//สุ่มเกิดศัตรู
 			for (i = 0; i < maxenemy; i++)
 			{
@@ -542,7 +559,12 @@ int main()
 					checkotherenemy(enemy[i].x, enemy[i].y);
 					draw_enemy(enemy[i].x, enemy[i].y);
 					enemy[i].status = 1;
-					enemy[i].hp = 10;
+					//enemy[i].hp = 10;
+					if (level>=7)
+					{
+						enemy[i].hp = 30;
+						enemy[i].dmg = 20;
+					}
 				}
 			}
 			//สุ่มเกิด enemy2
@@ -555,6 +577,11 @@ int main()
 					checkotherenemy(enemy2[i].x, enemy2[i].y);
 					draw_enemy2(enemy2[i].x, enemy2[i].y);
 					enemy2[i].status = 1;
+					if (level >= 7)
+					{
+						enemy2[i].hp = 50;
+						enemy2[i].dmg = 30;
+					}
 				}
 			}
 			//สุ่มเกิดmissile
@@ -568,6 +595,10 @@ int main()
 						missile[i].y = 5 + (rand() % 32);
 						draw_missile(missile[i].x, missile[i].y);
 						missile[i].status = 1;
+						if (level >= 7)
+						{
+							missile[i].dmg = 20;
+						}
 					}
 				}
 			}
@@ -582,6 +613,10 @@ int main()
 						beam[i].y = 5 + (rand() % 32);
 						draw_beam(beam[i].x, beam[i].y);
 						beam[i].status = 1;
+						if (level >= 7)
+						{
+							beam[i].dmg =30;
+						}
 					}
 				}
 			}
@@ -629,7 +664,6 @@ int main()
 							}
 							if (enemy2[e].hp == 0)
 							{
-								enemycount += 1;
 								clear_enemy(enemy2[e].x, enemy2[e].y);
 								score += 10;
 								//enemy2[e].status = 0;
@@ -925,6 +959,11 @@ int main()
 					maxenemy = 4;
 					maxenemy2 = 4;
 					maxmissile = 5;
+				}
+				if (level == 6)
+				{
+					maxenemy = 4;
+					maxenemy2 = 4;
 				}
 			}
 			//gameover
