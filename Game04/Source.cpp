@@ -63,20 +63,39 @@ struct Beam
 struct Ship
 {
 	int x = 10, y = 20;
-	int hp = 20;
+	int hp = 50;
 	int status = 0;
 }ship;
 
+struct Heal
+{
+	int x = 5;
+	int y = 3;
+	int status = 0;
+
+}heal;
+
+struct Gold
+{
+	int x = 5;
+	int y = 3;
+	int status = 0;
+	unsigned long time = 0;
+
+}gold;
+
 unsigned long frame = 1;
+int i;
+int current = 0;
 int maxenemy = 2;
 int maxenemy2 = 0;
 int maxmissile = 3;
-int maxmissile2 = 2;
 int changelevel = 100;
+int level = 1;
 int page = 0;
 int pointer = 1;
-int pointx = 46, pointy = 20;
-int level = 1;
+int pointx = 49, pointy = 20;
+
 
 char name[20];
 void setcursor(bool visible)
@@ -114,9 +133,14 @@ void clear_screen()
 
 void print_menu()
 {
-	setcolor(4, 0);
-	gotoxy(50, 20); printf("START GAME");
-	gotoxy(50, 22); printf("SCORE BOARD");
+	setcolor(7, 0);
+	if (frame != 1)
+	{
+		gotoxy(57, 18); printf("RESUME");
+	}
+	gotoxy(53, 20); printf("START NEW GAME");
+	gotoxy(55, 22); printf("SCORE BOARD");
+	gotoxy(48, 30); printf("PRESS SPACEBAR TO SELECT");
 }
 
 void clear_menu()
@@ -350,13 +374,6 @@ int* checkotherenemy(int x, int y)
 	
 }
 
-
-
-
-
-int i;
-int current = 0;
-
 int newex, newey;
 int* rnewxy;
 void rerandomenamyafterhit(int c) {
@@ -406,22 +423,39 @@ void rerandommissileafterhit(int c) {
 	missile[c].status = 1;
 }
 
-struct Heal
+void reset()
 {
-	int x = 5;
-	int y = 3;
-	int status = 0;
-
-}heal;
-
-struct Gold
-{
-	int x = 5;
-	int y = 3;
-	int status = 0;
-	unsigned long time = 0;
-
-}gold;
+	clear_screen();
+	frame = 1;
+	level = 1;
+	ship.hp = 50;
+	score = 0;
+	maxenemy = 2;
+	maxenemy2 = 0;
+	maxmissile = 3;
+	heal.status = 0;
+	gold.status = 0;
+	for (i = 0; i < maxenemy; i++)
+	{
+		enemy[i].status = 0;
+	}
+	for (i = 0; i < maxenemy2; i++)
+	{
+		enemy[i].status = 0;
+	}
+	for (i = 0; i < maxmissile; i++)
+	{
+		missile[i].status = 0;
+	}
+	for (i = 0; i < 2; i++)
+	{
+		beam[i].status = 0;
+	}
+	for ( i = 0; i < current; i++)
+	{
+		bs[i].status = 0;
+	}
+}
 
 
 
@@ -430,10 +464,7 @@ int main()
 	char ch = ' ';
 	setcursor(0);
 	srand(time(NULL));
-	
-	
 
-	int enemycount = 0;
 	do {
 		if (_kbhit()) {
 			ch = _getch();
@@ -466,6 +497,8 @@ int main()
 				{
 					clear_pointer(pointx, pointy);
 					if (pointy != 22) { pointy = pointy + 2; }
+					if (pointy == 20) { pointx = 49; }
+					if (pointy == 22) { pointx = 51; }
 					print_pointer(pointx, pointy);
 				}
 				if (page == 1)
@@ -483,7 +516,13 @@ int main()
 				if (page == 0)
 				{
 					clear_pointer(pointx, pointy);
-					if (pointy != 20) { pointy = pointy - 2; }
+					if (frame == 1)
+					{
+						if (pointy != 20) { pointy = pointy - 2; }
+					}
+					else { if (pointy != 18) { pointy = pointy - 2; }  }
+					if (pointy == 18) { pointx = 53; }
+					if (pointy == 20) { pointx = 49; }
 					print_pointer(pointx, pointy);
 				}
 				if (page == 1)
@@ -505,6 +544,28 @@ int main()
 					bs[current].y = ship.y + 1;
 					current = (current + 1) % 50;
 				}
+				if (page == 0)
+				{
+					if (pointy == 18)//point_resume
+					{
+						clear_screen();
+						page = 1;
+					}
+					if (pointy == 20)//point_start
+					{
+						clear_screen();
+						reset();
+						page = 1;
+					}
+					if (pointy == 22)//point_scoreboard
+					{
+						clear_screen();
+						page = 2;
+					}
+				}
+			}
+			if (ch =='e')
+			{
 				if (page == 2)
 				{
 					clear_screen();
@@ -516,22 +577,13 @@ int main()
 					page = 0;
 				}
 			}
-			if (ch =='e')
+			if (ch == 'p')
 			{
-				if (page == 0)
+				if (page == 1)
 				{
-					if (pointy == 20)//point_start
-					{
-						clear_screen();
-						page = 1;
-					}
-					if (pointy == 22)//point_scoreboard
-					{
-						clear_screen();
-						page = 2;
-					}
+					clear_screen();
+					page = 0;
 				}
-				
 			}
 			fflush(stdin);
 		}
@@ -646,7 +698,6 @@ int main()
 							}
 							if (enemy[e].hp == 0)
 							{
-								enemycount += 1;
 								clear_enemy(enemy[e].x, enemy[e].y);
 								score += 10;
 								//enemy[e].status = 0;
@@ -984,6 +1035,7 @@ int main()
 		if (page == 2)//scoreboard
 		{
 			gotoxy(53, 12); printf("SCORE BOARD");
+			gotoxy(48, 30); printf("PRESS E TO BACK TO MENU");
 			scoreRead("score.txt");
 			for (int i = 0; i < 5; i++)
 			{
@@ -1003,10 +1055,6 @@ int main()
 			scoreAdd("score.txt", name,score);
 			clear_screen();
 			page = 0;
-			frame = 0;
-			ship.hp = 20;
-			score = 0;
-			level = 0;
 		}
 
 	} while (ch != 'x');
