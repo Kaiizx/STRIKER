@@ -6,19 +6,21 @@
 #include <mutex>
 #include "ScoreBoard.h"
 
-#define _WIN32_WINNT 0x500
 #define screen_x 120
 #define screen_y 40
 
 HANDLE wHnd;
-HANDLE rHnd;
-DWORD fdwMode;
 COORD bufferSize = { screen_x,screen_y };
 SMALL_RECT windowSize = { 0,0,screen_x - 1,screen_y - 1 };
-CHAR_INFO consoleBuffer[screen_x * screen_y];
+
 
 
 std::mutex mtx;
+
+void beep(int del)
+{
+	Beep(700, del);
+}
 
 struct Bullet
 {
@@ -95,9 +97,16 @@ int level = 1;
 int page = 0;
 int pointer = 1;
 int pointx = 49, pointy = 20;
-
-
 char name[20];
+int mycolor = 2;
+
+int setConsole(int x, int y)
+{
+	wHnd = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleWindowInfo(wHnd, TRUE, &windowSize);
+	SetConsoleScreenBufferSize(wHnd, bufferSize);
+	return 0;
+}
 void setcursor(bool visible)
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -165,7 +174,7 @@ void clear_pointer(int x, int y)
 
 void draw_ship(int x, int y)
 {
-	if (ship.status==0){setcolor(2, 0);}
+	if (ship.status==0){setcolor(mycolor, 0);}
 	if (ship.status == 1) { setcolor(6, 0); }
 	
 	gotoxy(x, y - 1); printf("   _||==0  ");
@@ -180,6 +189,21 @@ void erase_ship(int x, int y)
 	gotoxy(x, y - 1); printf("             ");
 	gotoxy(x, y); printf("              ");
 	gotoxy(x, y + 1); printf("             ");
+}
+
+void flashing(int x, int y)
+{
+	if (ship.status == 0)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			Sleep(100);
+			mycolor = 0;
+			Sleep(100);
+			mycolor = 2;
+		}
+	}
+	
 }
 
 void draw_bullet(int x, int y)
@@ -464,7 +488,7 @@ int main()
 	char ch = ' ';
 	setcursor(0);
 	srand(time(NULL));
-
+	setConsole(screen_x, screen_y);
 	do {
 		if (_kbhit()) {
 			ch = _getch();
@@ -745,9 +769,11 @@ int main()
 							if (ship.status == 0)
 							{
 								ship.hp = ship.hp - enemy[e].dmg;
-								erase_ship(ship.x, ship.y);
-								Sleep(10);
-								draw_ship(ship.x, ship.y);
+								std::thread p(flashing,ship.x,ship.y);
+								p.detach();
+								std::thread q(beep, 500);
+								q.detach();
+								
 							}
 							if (ship.status==1)
 							{
@@ -786,9 +812,10 @@ int main()
 							if (ship.status == 0)
 							{
 								ship.hp = ship.hp - enemy2[e].dmg;
-								erase_ship(ship.x, ship.y);
-								Sleep(10);
-								draw_ship(ship.x, ship.y);
+								std::thread p(flashing, ship.x, ship.y);
+								p.detach();
+								std::thread q(beep, 500);
+								q.detach();
 							}
 							if (ship.status == 1)//gold
 							{
@@ -826,9 +853,10 @@ int main()
 							if (ship.status == 0)
 							{
 								ship.hp = ship.hp - 10;
-								erase_ship(ship.x, ship.y);
-								Sleep(10);
-								draw_ship(ship.x, ship.y);
+								std::thread p(flashing, ship.x, ship.y);
+								p.detach();
+								std::thread q(beep, 500);
+								q.detach();
 							}
 							if (ship.status == 1)//gold
 							{
@@ -890,9 +918,10 @@ int main()
 							if (ship.status == 0)
 							{
 								ship.hp = ship.hp - 10;
-								erase_ship(ship.x, ship.y);
-								Sleep(10);
-								draw_ship(ship.x, ship.y);
+								std::thread p(flashing, ship.x, ship.y);
+								p.detach();
+								std::thread q(beep, 500);
+								q.detach();
 							}
 							if (ship.status == 1)//gold
 							{
@@ -1015,6 +1044,11 @@ int main()
 				{
 					maxenemy = 4;
 					maxenemy2 = 4;
+				}
+				if (level == 7)
+				{
+					maxenemy = 5;
+					maxenemy2 = 5;
 				}
 			}
 			//gameover
