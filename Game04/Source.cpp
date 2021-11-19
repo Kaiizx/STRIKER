@@ -1,8 +1,10 @@
-﻿#include <stdio.h>
+﻿#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
 #include <conio.h>
 #include <windows.h>
 #include <time.h>
 #include <thread>
+#include <string.h>
 #include "ScoreBoard.h"
 
 #define screen_x 120
@@ -17,7 +19,6 @@ void getItemSound()
 {
 	Beep(1200, 25);
 	Beep(900, 25);
-	
 }
 
 void HitSound()
@@ -29,7 +30,6 @@ void BsHit()
 {
 	Beep(1000, 100);
 }
-
 
 struct Bullet
 {
@@ -141,6 +141,30 @@ void gotoxy(int x, int y)
 		GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
 
+void defaults()
+{
+	int newWidth = 8, newHeight = 16;
+	CONSOLE_FONT_INFOEX fontStructure = { 0 };
+	fontStructure.cbSize = sizeof(fontStructure);
+	fontStructure.dwFontSize.X = newWidth;
+	fontStructure.dwFontSize.Y = newHeight;
+	wcscpy(fontStructure.FaceName, L"Consolas");
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetCurrentConsoleFontEx(hConsole, true, &fontStructure);
+}
+
+void bigger()
+{
+	int newWidth = 24, newHeight = 48;
+	CONSOLE_FONT_INFOEX fontStructure = { 0 };
+	fontStructure.cbSize = sizeof(fontStructure);
+	fontStructure.dwFontSize.X = newWidth;
+	fontStructure.dwFontSize.Y = newHeight;
+	wcscpy(fontStructure.FaceName, L"Consolas");
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetCurrentConsoleFontEx(hConsole, true, &fontStructure);
+}
+
 void border()
 {
 	setcolor(0, 7);
@@ -154,6 +178,19 @@ void border()
 		gotoxy(0, j); printf(" ");
 		gotoxy(119, j); printf(" ");
 	}
+}
+
+void myname() 
+{
+	setcolor(7,0);
+	gotoxy(100, 34); printf("Atikan Payungthong");
+	gotoxy(97, 35); printf("Student ID : 64010956");
+}
+
+void gamename()
+{
+	setcolor(7, 0);
+	gotoxy(10, 10); printf("STRIKER");
 }
 
 void clear_screen()
@@ -177,14 +214,18 @@ void clear_screen()
 
 void print_menu()
 {
+	defaults();
+	myname();
 	setcolor(7, 0);
 	if (frame != 1)
 	{
-		gotoxy(57, 18); printf("RESUME");
+		gotoxy(58, 18); printf("RESUME");
 	}
 	gotoxy(54, 20); printf("START NEW GAME");
 	gotoxy(55, 22); printf("SCORE BOARD");
+	gotoxy(59, 24); printf("EXIT");
 	gotoxy(48, 30); printf("PRESS SPACEBAR TO SELECT");
+	myname();
 }
 
 void clear_menu()
@@ -514,7 +555,7 @@ void rerandommissileafterhit(int c) {
 void reset()
 {
 	clear_screen();
-	frame = 0;
+	frame = 1;
 	level = 1;
 	ship.hp = 50;
 	score = 0;
@@ -545,8 +586,6 @@ void reset()
 	}
 }
 
-
-
 int main()
 {
 	char ch = ' ';
@@ -554,7 +593,8 @@ int main()
 	srand(time(NULL));
 	setConsole(screen_x, screen_y);
 	border();
-	do {
+	while (true)
+	{
 		if (_kbhit()) {
 			ch = _getch();
 			if (ch == 'a')
@@ -587,9 +627,10 @@ int main()
 					std::thread q(HitSound);
 					q.detach();
 					clear_pointer(pointx, pointy);
-					if (pointy != 22) { pointy = pointy + 2; }
+					if (pointy != 24) { pointy = pointy + 2; }
 					if (pointy == 20) { pointx = 50; }
 					if (pointy == 22) { pointx = 51; }
+					if (pointy == 24) { pointx = 55; }
 					print_pointer(pointx, pointy);
 				}
 				if (page == 1)
@@ -614,8 +655,9 @@ int main()
 						if (pointy != 20) { pointy = pointy - 2; }
 					}
 					else { if (pointy != 18) { pointy = pointy - 2; }  }
-					if (pointy == 18) { pointx = 53; }
+					if (pointy == 18) { pointx = 54; }
 					if (pointy == 20) { pointx = 50; }
+					if (pointy == 22) { pointx = 51; }
 					print_pointer(pointx, pointy);
 					
 				}
@@ -646,6 +688,15 @@ int main()
 					{
 						clear_screen();
 						page = 1;
+						if (gbstatus == 1)
+						{
+							gold_bar();
+							for (int i = gold.retimer; i < 43; i++)
+							{
+								setcolor(0,0);
+								gotoxy(i, 1); printf(" ");
+							}
+						}
 					}
 					if (pointy == 20)//point_start
 					{
@@ -657,6 +708,11 @@ int main()
 					{
 						clear_screen();
 						page = 2;
+					}
+					if (pointy==24)
+					{
+						PostMessage(GetConsoleWindow(), WM_CLOSE, 0, 0);
+						break;
 					}
 				}
 			}
@@ -679,14 +735,13 @@ int main()
 				{
 					clear_screen();
 					page = 0;
-					gbstatus == 0;
 				}
 			}
 			fflush(stdin);
 		}
+	
 		if (page == 0)//menu 
 		{
-			
 			print_pointer(pointx,pointy);
 			print_menu();
 		}
@@ -851,7 +906,6 @@ int main()
 								p.detach();
 								std::thread q(HitSound);
 								q.detach();
-								
 							}
 							if (ship.status==1)
 							{
@@ -1032,7 +1086,7 @@ int main()
 				heal.status = 1;
 			}
 
-			if (frame % 1000 == 0 && gold.status == 0)
+			if (frame % 3000 == 0 && gold.status == 0)
 			{
 				gold.x = 20 + (rand() % 70);
 				gold.y = 4;
@@ -1121,11 +1175,6 @@ int main()
 
 			if (ship.hp > 500) { ship.hp = 500; }
 
-
-
-			
-
-
 			//changelevel
 			if (score > changelevel)
 			{
@@ -1202,7 +1251,7 @@ int main()
 			page = 0;
 		}
 
-	} while (ch != 'x');
+	};
 
 	return 0;
 }
