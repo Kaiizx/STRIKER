@@ -218,8 +218,10 @@ void clear_screen()
 	}
 }
 
+
 void print_menu()
 {
+	
 	defaults();
 	myname();
 	gamename();
@@ -241,6 +243,7 @@ void clear_menu()
 	gotoxy(50, 20); printf("          ");
 	gotoxy(50, 22); printf("           ");
 }
+
 
 void print_pointer(int x,int y)
 {
