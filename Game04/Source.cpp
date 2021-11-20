@@ -190,7 +190,13 @@ void myname()
 void gamename()
 {
 	setcolor(7, 0);
-	gotoxy(10, 10); printf("STRIKER");
+	gotoxy(30,9);  printf("   _____   _______   _____    _____   _  __  ______   _____  ");
+	gotoxy(30, 10);  printf("  / ____| |__   __| |  __ \\  |_   _| | |/ / |  ____| |  __ \\ ");
+	gotoxy(30, 11);  printf(" | (___      | |    | |__) |   | |   | ' /  | |__    | |__) |");
+	gotoxy(30, 12);  printf("  \\___ \\     | |    |  _  /    | |   |  <   |  __|   |  _  / ");
+	gotoxy(30, 13); printf("  ____) |    | |    | | \\ \\   _| |_  | . \\  | |____  | | \\ \\");
+	gotoxy(30, 14); printf(" |_____/     |_|    |_|  \\_\\ |_____| |_|\\_\\ |______| |_|  \\_\\");
+	
 }
 
 void clear_screen()
@@ -216,6 +222,7 @@ void print_menu()
 {
 	defaults();
 	myname();
+	gamename();
 	setcolor(7, 0);
 	if (frame != 1)
 	{
@@ -450,8 +457,8 @@ void gold_bar()
 void print_level(int x)
 {
 	setcolor(4, 0);
-	gotoxy(17, 1); printf("   ");
-	gotoxy(10, 1); printf("Level : %d", x);
+	gotoxy(102, 0); printf("   ");
+	gotoxy(95, 0); printf("Level : %d", x);
 }
 
 void print_frame(int x)
@@ -716,22 +723,19 @@ int main()
 					}
 				}
 			}
-			if (ch =='e')
+			if (ch ==VK_ESCAPE)
 			{
+				if (page == 1)
+				{
+					clear_screen();
+					page = 0;
+				}
 				if (page == 2)
 				{
 					clear_screen();
 					page = 0;
 				}
 				if (page == 3)
-				{
-					clear_screen();
-					page = 0;
-				}
-			}
-			if (ch == 'p')
-			{
-				if (page == 1)
 				{
 					clear_screen();
 					page = 0;
@@ -751,8 +755,7 @@ int main()
 			hp_bar(ship.hp);
 			print_score(score);
 			//print_hp(ship.hp);
-			//print_level(level);
-			print_frame(frame);
+			print_level(level);
 			//สุ่มเกิดศัตรู
 			for (i = 0; i < maxenemy; i++)
 			{
@@ -1055,7 +1058,7 @@ int main()
 							beam[e].status = 0;
 							if (ship.status == 0)
 							{
-								ship.hp = ship.hp - 10;
+								ship.hp = ship.hp - 30;
 								std::thread p(flashing, ship.x, ship.y);
 								p.detach();
 								std::thread q(HitSound);
@@ -1229,7 +1232,7 @@ int main()
 		if (page == 2)//scoreboard
 		{
 			gotoxy(53, 12); printf("SCORE BOARD");
-			gotoxy(48, 30); printf("PRESS E TO BACK TO MENU");
+			gotoxy(47, 30); printf("PRESS ESE TO BACK TO MENU");
 			scoreRead("score.txt");
 			for (int i = 0; i < 5; i++)
 			{
