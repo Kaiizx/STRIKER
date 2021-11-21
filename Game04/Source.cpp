@@ -31,6 +31,12 @@ void BsHit()
 	Beep(1000, 100);
 }
 
+struct Star
+{
+	int x = 0;
+	int y = 0;
+}star[100];
+
 struct Bullet
 {
 	int status = 0;
@@ -109,9 +115,12 @@ int pointer = 1;
 int pointx = 50, pointy = 20;
 char name[20];
 int mycolor = 2;
+int starcolor = 7;
 int hpbar=0;
 int oldhpbar = 40;
 int gbstatus = 0;
+int grassx[15],grassy[15];
+int rockx[15], rocky[15];
 
 int setConsole(int x, int y)
 {
@@ -180,6 +189,78 @@ void border()
 	}
 }
 
+void starflash()
+{	
+	Sleep(500);
+	starcolor = 0;
+	Sleep(500);
+	starcolor = 7;
+}
+
+void init_star() 
+{
+	for (int i = 0; i < 20; i++) 
+	{
+		star[i].x = 2 + rand() % 117;
+		star[i].y = 4 + rand() % 3;
+	}
+	for (int i = 20; i < 30; i++)
+	{
+		star[i].x = 2 + rand() % 27;
+		star[i].y = 9 + rand() % 5;
+	}
+	for (int i = 30; i < 40; i++)
+	{
+		star[i].x = 91 + rand() % 16;
+		star[i].y = 9 + rand() % 5;
+	}
+	for (int i = 40; i < 60; i++)
+	{
+		star[i].x = 2 + rand() % 45;
+		star[i].y = 15 + rand() % 15;
+	}
+	for (int i = 60; i < 80; i++)
+	{
+		star[i].x = 73 + rand() % 45;
+		star[i].y = 15 + rand() % 15;
+	}
+	for (int i = 80; i < 100; i++)
+	{
+		star[i].x = 2 + rand() % 95;
+		star[i].y = 31 + rand() % 7;
+	}
+}
+
+void init_star2()
+{
+	for (int i = 0; i < 20; i++)
+	{
+		star[i].x = 3 + rand() % 112;
+		star[i].y = 6 + rand() % 30;
+	}
+}
+
+void star_fall()
+{
+	setcolor(starcolor, 0);
+	if (page == 0)
+	{
+		for (int i = 0; i < 100; i++)
+		{
+			gotoxy(star[i].x, star[i].y); printf(".");
+		}
+	}
+	if (page==1)
+	{
+		for (int i = 0; i < 20; i++)
+		{
+			gotoxy(star[i].x, star[i].y); printf(".");
+		}
+	}
+}
+
+
+
 void myname() 
 {
 	setcolor(7,0);
@@ -190,13 +271,49 @@ void myname()
 void gamename()
 {
 	setcolor(7, 0);
-	gotoxy(30,9);  printf("   _____   _______   _____    _____   _  __  ______   _____  ");
+	gotoxy(30,9);    printf("   _____   _______   _____    _____   _  __  ______   _____  ");
 	gotoxy(30, 10);  printf("  / ____| |__   __| |  __ \\  |_   _| | |/ / |  ____| |  __ \\ ");
 	gotoxy(30, 11);  printf(" | (___      | |    | |__) |   | |   | ' /  | |__    | |__) |");
 	gotoxy(30, 12);  printf("  \\___ \\     | |    |  _  /    | |   |  <   |  __|   |  _  / ");
-	gotoxy(30, 13); printf("  ____) |    | |    | | \\ \\   _| |_  | . \\  | |____  | | \\ \\");
-	gotoxy(30, 14); printf(" |_____/     |_|    |_|  \\_\\ |_____| |_|\\_\\ |______| |_|  \\_\\");
+	gotoxy(30, 13);  printf("  ____) |    | |    | | \\ \\   _| |_  | . \\  | |____  | | \\ \\");
+	gotoxy(30, 14);  printf(" |_____/     |_|    |_|  \\_\\ |_____| |_|\\_\\ |______| |_|  \\_\\");
 	
+}
+
+
+void rock()
+{
+	setcolor(8,0);
+	for (int i = 0; i < 15; i++)
+	{
+		gotoxy(rockx[i], rocky[i]); printf(" ..O  _._");
+	}
+	
+}
+
+void grass()
+{
+	setcolor(8, 0);
+	for (int i = 0; i < 15; i++)
+	{
+		gotoxy(grassx[i], grassy[i]); printf("\|/  \^^/");
+	}
+}
+void initgrass()
+{
+	for (int i = 0; i < 15; i++)
+	{
+		grassx[i] = 3 + (rand() % 110);
+		grassy[i] = 6 + (rand() % 32);
+	}
+}
+void initrock()
+{
+	for (int i = 0; i < 15; i++)
+	{
+		rockx[i] = 3 + (rand() % 110);
+		rocky[i] = 6 + (rand() % 32);
+	}
 }
 
 void clear_screen()
@@ -221,20 +338,17 @@ void clear_screen()
 
 void print_menu()
 {
-	
 	defaults();
 	myname();
 	gamename();
+	star_fall();
+	
 	setcolor(7, 0);
-	if (frame != 1)
-	{
-		gotoxy(58, 18); printf("RESUME");
-	}
+	if (frame != 1){ gotoxy(58, 18); printf("RESUME");}
 	gotoxy(54, 20); printf("START NEW GAME");
 	gotoxy(55, 22); printf("SCORE BOARD");
 	gotoxy(59, 24); printf("EXIT");
 	gotoxy(48, 30); printf("PRESS SPACEBAR TO SELECT");
-	myname();
 }
 
 void clear_menu()
@@ -603,6 +717,9 @@ int main()
 	srand(time(NULL));
 	setConsole(screen_x, screen_y);
 	border();
+	init_star();
+	initgrass();
+	initrock();
 	while (true)
 	{
 		if (_kbhit()) {
@@ -754,10 +871,12 @@ int main()
 		}
 		if (page == 1)//gamestart
 		{
+			rock();
+			grass();
+
 			draw_ship(ship.x, ship.y);
 			hp_bar(ship.hp);
 			print_score(score);
-			//print_hp(ship.hp);
 			print_level(level);
 			//สุ่มเกิดศัตรู
 			for (i = 0; i < maxenemy; i++)
