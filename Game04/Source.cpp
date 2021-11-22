@@ -243,20 +243,11 @@ void init_star2()
 void star_fall()
 {
 	setcolor(starcolor, 0);
-	if (page == 0)
+	for (int i = 0; i < 100; i++)
 	{
-		for (int i = 0; i < 100; i++)
-		{
-			gotoxy(star[i].x, star[i].y); printf(".");
-		}
+		gotoxy(star[i].x, star[i].y); printf(".");
 	}
-	if (page==1)
-	{
-		for (int i = 0; i < 20; i++)
-		{
-			gotoxy(star[i].x, star[i].y); printf(".");
-		}
-	}
+	
 }
 
 
@@ -284,7 +275,7 @@ void gamename()
 void rock()
 {
 	setcolor(8,0);
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		gotoxy(rockx[i], rocky[i]); printf(" ..       _._");
 	}
@@ -294,14 +285,14 @@ void rock()
 void grass()
 {
 	setcolor(8, 0);
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		gotoxy(grassx[i], grassy[i]); printf("\\|/       \\^^/");
 	}
 }
 void initgrass()
 {
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		grassx[i] = 3 + (rand() % 100);
 		grassy[i] = 6 + (rand() % 32);
@@ -309,7 +300,7 @@ void initgrass()
 }
 void initrock()
 {
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		rockx[i] = 3 + (rand() % 100);
 		rocky[i] = 6 + (rand() % 32);
@@ -1353,6 +1344,7 @@ int main()
 		}
 		if (page == 2)//scoreboard
 		{
+			star_fall();
 			gotoxy(53, 12); printf("SCORE BOARD");
 			gotoxy(47, 30); printf("PRESS ESE TO BACK TO MENU");
 			scoreRead("score.txt");
