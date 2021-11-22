@@ -12,7 +12,7 @@
 
 HANDLE wHnd;
 COORD bufferSize = { screen_x,screen_y };
-SMALL_RECT windowSize = { 0,0,screen_x-1,screen_y-1 };
+SMALL_RECT windowSize = { 0,0,screen_x,screen_y };
 
 
 void getItemSound()
@@ -176,7 +176,7 @@ void bigger()
 
 void border()
 {
-	setcolor(0, 7);
+	setcolor(0, 15);
 	for (int i = 0; i < 120; i++)
 	{
 		gotoxy(i, 3); printf(" ");
@@ -286,24 +286,24 @@ void rock()
 	setcolor(8,0);
 	for (int i = 0; i < 15; i++)
 	{
-		gotoxy(rockx[i], rocky[i]); printf(" ..O  _._");
+		gotoxy(rockx[i], rocky[i]); printf(" ..       _._");
 	}
 	
 }
 
 void grass()
 {
-	setcolor(8, 0);
+	setcolor(6, 0);
 	for (int i = 0; i < 15; i++)
 	{
-		gotoxy(grassx[i], grassy[i]); printf("\|/  \^^/");
+		gotoxy(grassx[i], grassy[i]); printf("\\|/       \\^^/");
 	}
 }
 void initgrass()
 {
 	for (int i = 0; i < 15; i++)
 	{
-		grassx[i] = 3 + (rand() % 110);
+		grassx[i] = 3 + (rand() % 100);
 		grassy[i] = 6 + (rand() % 32);
 	}
 }
@@ -311,7 +311,7 @@ void initrock()
 {
 	for (int i = 0; i < 15; i++)
 	{
-		rockx[i] = 3 + (rand() % 110);
+		rockx[i] = 3 + (rand() % 100);
 		rocky[i] = 6 + (rand() % 32);
 	}
 }
