@@ -119,8 +119,8 @@ int starcolor = 7;
 int hpbar=0;
 int oldhpbar = 40;
 int gbstatus = 0;
-int grassx[15],grassy[15];
-int rockx[15], rocky[15];
+int grassx[5],grassy[5];
+int rockx[5], rocky[5];
 
 int setConsole(int x, int y)
 {
@@ -275,7 +275,7 @@ void gamename()
 void rock()
 {
 	setcolor(8,0);
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		gotoxy(rockx[i], rocky[i]); printf(" ..       _._");
 	}
@@ -285,14 +285,14 @@ void rock()
 void grass()
 {
 	setcolor(8, 0);
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		gotoxy(grassx[i], grassy[i]); printf("\\|/       \\^^/");
 	}
 }
 void initgrass()
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		grassx[i] = 3 + (rand() % 100);
 		grassy[i] = 6 + (rand() % 32);
@@ -300,7 +300,7 @@ void initgrass()
 }
 void initrock()
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		rockx[i] = 3 + (rand() % 100);
 		rocky[i] = 6 + (rand() % 32);
