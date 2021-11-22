@@ -293,7 +293,7 @@ void rock()
 
 void grass()
 {
-	setcolor(6, 0);
+	setcolor(8, 0);
 	for (int i = 0; i < 15; i++)
 	{
 		gotoxy(grassx[i], grassy[i]); printf("\\|/       \\^^/");
