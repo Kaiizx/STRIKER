@@ -575,10 +575,7 @@ void print_frame(int x)
 	gotoxy(50, 0); printf("frame : %d", x);
 }
 
-void gameover() {
-	setcolor(4, 0);
-	printf("GAME OVER");
-}
+
 
 int xy[2];int counter = 0;int around = 0;
 int* checkotherenemy(int x, int y)
@@ -1358,14 +1355,21 @@ int main()
 		}
 		if (page == 3)//gameover
 		{
+			reset();
 			scoreRead("score.txt");
-			gotoxy(55, 14); gameover();
-			gotoxy(55, 16); printf("ENTER YOUR NAME");
-			gotoxy(55, 18);
+			star_fall();
+			gotoxy(54, 14); printf("GAME OVER");
+			gotoxy(53, 16); printf("NICE TRY,BRO");
+			gotoxy(51, 18); printf("ENTER YOUR NAME");
+			setcursor(1);
+			gotoxy(51, 20);
 			scanf_s("%19s", name,20);
 			scoreAdd("score.txt", name,score);
 			clear_screen();
+			setcursor(0);
+			pointx = 50; pointy = 20;
 			page = 0;
+			
 		}
 
 	};
