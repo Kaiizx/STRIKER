@@ -747,10 +747,13 @@ void reset()
     for (i = 0; i < maxenemy; i++)
     {
         enemy[i].status = 0;
+        enemy[i].hp = 10;
     }
     for (i = 0; i < maxenemy2; i++)
     {
-        enemy[i].status = 0;
+        enemy2[i].status = 0;
+        enemy2[i].hp = 30;
+
     }
     for (i = 0; i < maxmissile; i++)
     {
