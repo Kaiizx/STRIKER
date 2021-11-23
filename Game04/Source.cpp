@@ -12,7 +12,7 @@
 
 HANDLE wHnd;
 COORD bufferSize = { screen_x, screen_y };
-SMALL_RECT windowSize = { 0, 0, screen_x, screen_y };
+SMALL_RECT windowSize = { 0, 0, screen_x-1, screen_y-1 };
 
 void getItemSound()
 {
@@ -234,14 +234,6 @@ void init_star()
     }
 }
 
-void init_star2()
-{
-    for (int i = 0; i < 20; i++)
-    {
-        star[i].x = 3 + rand() % 112;
-        star[i].y = 6 + rand() % 30;
-    }
-}
 
 void star_fall()
 {
@@ -744,6 +736,8 @@ void reset()
     frame = 1;
     level = 1;
     ship.hp = 50;
+    ship.x = 10 ;
+    ship.y = 20;
     score = 0;
     maxenemy = 2;
     maxenemy2 = 0;
@@ -774,10 +768,10 @@ void reset()
 
 int main()
 {
+    setConsole(screen_x, screen_y);
     char ch = ' ';
     setcursor(0);
     srand(time(NULL));
-    setConsole(screen_x, screen_y);
     border();
     init_star();
     initgrass();
