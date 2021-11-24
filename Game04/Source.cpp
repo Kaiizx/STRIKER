@@ -991,7 +991,6 @@ int main()
                     checkotherenemy(enemy[i].x, enemy[i].y);
                     draw_enemy(enemy[i].x, enemy[i].y);
                     enemy[i].status = 1;
-                    //enemy[i].hp = 10;
                     if (level >= 10)
                     {
                         enemy[i].hp = 30;
@@ -1082,7 +1081,6 @@ int main()
                                 std::thread q(BsHit);
                                 q.detach();
                                 score += 10;
-                                //enemy[e].status = 0;
                                 rerandomenamyafterhit(e);
                             }
                         }
@@ -1099,8 +1097,7 @@ int main()
                             if (enemy2[e].hp == 0)
                             {
                                 clear_enemy(enemy2[e].x, enemy2[e].y);
-                                score += 10;
-                                //enemy2[e].status = 0;
+                                score += 20;
                                 rerandomenamy2afterhit(e);
                             }
                         }
@@ -1117,7 +1114,6 @@ int main()
                     if (enemy[e].x <= 1) //ชนขอบ
                     {
                         clear_enemy(enemy[e].x, enemy[e].y);
-                        //rerandomenamyafterhit(e);
                         enemy[e].status = 0;
                     }
                     else
@@ -1141,7 +1137,6 @@ int main()
                                 score += 10;
                                 ship.hp += 5;
                             }
-                            //rerandomenamyafterhit(e);
                         }
                         else
                         {
@@ -1163,7 +1158,6 @@ int main()
                     {
                         clear_enemy(enemy2[e].x, enemy2[e].y);
                         enemy2[e].status = 0;
-                        //rerandomenamy2afterhit(e);
                     }
                     else
                     {
@@ -1183,10 +1177,9 @@ int main()
                             {
                                 std::thread q(BsHit);
                                 q.detach();
-                                score += 10;
+                                score += 20;
                                 ship.hp += 5;
                             }
-                            //rerandomenamy2afterhit(e);
                         }
                         else
                         {
@@ -1208,7 +1201,6 @@ int main()
                     {
                         clear_missile(missile[e].x, missile[e].y);
                         missile[e].status = 0;
-                        //rerandommissileafterhit(e);
                     }
                     else
                     {
@@ -1231,7 +1223,6 @@ int main()
                                 score += 10;
                                 ship.hp += 5;
                             }
-                            //rerandommissileafterhit(e);
                         }
                         else
                         {
@@ -1486,7 +1477,7 @@ int main()
             gotoxy(53, 12);
             printf("SCORE BOARD");
             gotoxy(47, 30);
-            printf("PRESS ESE TO BACK TO MENU");
+            printf("PRESS ESC TO BACK TO MENU");
             scoreRead("score.txt");
             for (int i = 0; i < 5; i++)
             {
@@ -1498,7 +1489,7 @@ int main()
         }
         if (page == 3) //gameover
         {
-            reset();
+            
             scoreRead("score.txt");
             star_fall();
             gotoxy(54, 14);
@@ -1516,6 +1507,7 @@ int main()
             pointx = 50;
             pointy = 20;
             page = 0;
+            reset();
         }
     }
 

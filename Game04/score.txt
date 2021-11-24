@@ -1,5 +1,5 @@
 Player,1051
+Lastbug,1005
 Name01,955
-Nm,800
 Player007,800
 asdasd,800
